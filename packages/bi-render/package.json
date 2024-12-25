@@ -1,0 +1,34 @@
+{
+  "name": "@pb-renders/bi-render",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/typing/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "tsup src/index.ts --watch",
+    "setup": "tsup src/index.ts",
+    "build": "tsup src/index.ts",
+    "lint:js": "eslint src/**/*.{js,jsx,ts,tsx}",
+    "lint:css": "stylelint --allow-empty-input 'src/**/*.{css,less}'",
+    "lint:format": "prettier --check *.md *.json src/**/*.{js,jsx,ts,tsx,css,less,md,json}",
+    "lint:typing": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@pb-renders/config-tsconfig": "workspace:^",
+    "@pb-renders/config-tsup": "workspace:^",
+    "@types/react": "^18.0.28"
+  },
+  "peerDependencies": {
+    "antd": "^5.0.0",
+    "react": "^18.0.0"
+  }
+}
