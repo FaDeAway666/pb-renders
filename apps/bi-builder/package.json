@@ -13,15 +13,22 @@
     "lint:typing": "tsc --noEmit"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.5.2",
+    "@pb-renders/bi-render": "workspace:^",
+    "antd": "^5.22.6",
     "react": "^18.3.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
-    "@pb-renders/bi-render": "workspace:^"
+    "uuid": "^11.0.3",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "globals": "^15.13.0",
+    "less": "^4.2.1",
     "vite": "^5.4.11"
   }
 }

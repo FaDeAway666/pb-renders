@@ -1,5 +1,5 @@
 module.exports = {
-  '*.{html,js,jsx,ts,tsx,css,less,json,md}': ['prettier --check --ignore-unknown'],
+  '*.md *.json src/**/*.{js,jsx,ts,tsx,css,less,md,json}': ['prettier --check --ignore-unknown --write'],
   '*.{css,less}': ['stylelint --allow-empty-input --fix'],
   '*.{js,jsx,ts,tsx}': ['eslint'],
   // FIXME: disabling type checking until we are ready

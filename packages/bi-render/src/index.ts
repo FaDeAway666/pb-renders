@@ -1,3 +1,7 @@
-import * as Renderer from '@/components/renderer';
+import Renderer from '@/components/renderer';
 
-export { Renderer };
+import Chart from './components/chart';
+import GridRenderer from './components/renderer/grid';
+
+export * from './types'
+export { Renderer, GridRenderer, Chart };
