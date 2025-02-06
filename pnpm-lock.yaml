@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      echarts:
-        specifier: '5'
-        version: 5.6.0
     devDependencies:
       '@commitlint/cli':
         specifier: ^17.4.4
@@ -60,6 +56,9 @@ importers:
       '@pb-renders/bi-render':
         specifier: workspace:^
         version: link:../../packages/bi-render
+      '@pb-renders/utils':
+        specifier: workspace:^
+        version: link:../../packages/utils
       antd:
         specifier: ^5.22.6
         version: 5.22.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -103,12 +102,21 @@ importers:
 
   packages/bi-render:
     dependencies:
+      '@pb-renders/utils':
+        specifier: workspace:^
+        version: link:../utils
       antd:
         specifier: ^5.0.0
         version: 5.22.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      echarts:
+        specifier: ^5
+        version: 5.6.0
       react:
         specifier: ^18.0.0
         version: 18.3.1
+      react-dom:
+        specifier: ^18.0.0
+        version: 18.3.1(react@18.3.1)
     devDependencies:
       '@pb-renders/config-tsconfig':
         specifier: workspace:^

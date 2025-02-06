@@ -14,7 +14,6 @@
     "setup": "tsup src/index.ts",
     "build": "tsup src/index.ts",
     "lint:js": "eslint src/**/*.{js,jsx,ts,tsx}",
-    "lint:css": "stylelint --allow-empty-input 'src/**/*.{css,less}'",
     "lint:format": "prettier --check *.md *.json src/**/*.{js,jsx,ts,tsx,css,less,md,json}",
     "lint:typing": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,6 +21,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "private": true,
   "devDependencies": {
     "@pb-renders/config-tsconfig": "workspace:^",
     "@pb-renders/config-tsup": "workspace:^"

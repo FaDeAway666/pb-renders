@@ -1,7 +1,6 @@
 export interface ChartConfig {
   type: string;
   key: string;
-  height?: number;
   col?: number;
   row?: number;
   colSpan?: number;
@@ -19,11 +18,11 @@ export interface RenderConfig {
   colNum?: number;
   theme?: string;
   autofit?: boolean;
-  children: Array<ChartConfig>
+  children: Array<ChartConfig>;
 }
 
 export interface IRenderProps {
   config: RenderConfig;
-  mode: 'grid' | 'free',
-  data: Record<string, () => unknown>
+  mode: 'grid' | 'free';
+  data: Record<string, () => unknown>;
 }

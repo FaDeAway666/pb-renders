@@ -39,6 +39,8 @@ import {
 import type { ECBasicOption } from 'echarts/types/dist/shared';
 import { useEffect, useMemo, useRef } from 'react';
 
+import type { ChartConfig } from '@/types';
+
 echarts.use([
   TitleComponent,
   TooltipComponent,
@@ -49,27 +51,37 @@ echarts.use([
 ]);
 
 interface ChartProps {
-  width: number;
-  height: number;
-  col?: number;
-  row?: number;
-  colSpan?: number;
-  rowSpan?: number;
-  options: ECBasicOption;
+  baseRect: { colWidth: number; rowHeight: number };
+  chartConfig: ChartConfig;
+  colGutter?: number;
+  rowGutter?: number;
 }
 
 const Chart = (props: ChartProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
-  const { width, height, options, col, row, colSpan, rowSpan } = props;
+  const {
+    baseRect,
+    chartConfig: { options, row, col, rowSpan, colSpan },
+    colGutter = 20,
+    rowGutter = 20,
+  } = props;
 
   const chartStyle = useMemo(() => {
     return {
-      width: `${width}px`,
-      height: `${height}px`,
+      width: `${
+        colSpan
+          ? baseRect.colWidth * colSpan + colGutter * (colSpan - 1)
+          : baseRect.colWidth
+      }px`,
+      height: `${
+        rowSpan
+          ? baseRect.rowHeight * rowSpan + rowGutter * (rowSpan - 1)
+          : baseRect.rowHeight
+      }px`,
       gridRow: rowSpan ? `${row} / span ${rowSpan}` : row,
       gridCol: colSpan ? `${col} / span ${colSpan}` : col,
     };
-  }, [width, height, col, row, colSpan, rowSpan]);
+  }, [baseRect, col, row, colSpan, colGutter, rowGutter]);
 
   useEffect(() => {
     const chart = echarts.init(chartRef.current);

@@ -9,13 +9,15 @@ interface IPanelProps {
   id: string;
   selectedId: string;
   chartDragging?: boolean;
-  onSelect: (id: string) => void;
   children: React.ReactNode;
   chartConfig: ChartConfig;
+  onSelect: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onCopy?: (id: string) => void;
 }
 
 const ChartPanel: React.FC<IPanelProps> = (props: IPanelProps) => {
-  const { children, id, selectedId, onSelect, chartConfig } = props;
+  const { children, id, selectedId, onSelect, onCopy, onDelete, chartConfig } = props;
   const isSelected = useMemo(() => id === selectedId, [id, selectedId]);
 
   const { row, col, rowSpan, colSpan } = chartConfig;
@@ -31,12 +33,26 @@ const ChartPanel: React.FC<IPanelProps> = (props: IPanelProps) => {
     <DragItem type="chart" item={{ key: id }} style={{ ...gridStyle }}>
       <div
         className={`chart-panel ${isSelected ? 'panel-selected' : ''}`}
-        onClick={() => onSelect(id)}
+        onMouseDown={() => onSelect(id)}
       >
         {isSelected && (
           <div className="icons">
-            <CopyOutlined />
-            <DeleteOutlined />
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                onCopy?.(id);
+              }}
+            >
+              <CopyOutlined />
+            </div>
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.(id);
+              }}
+            >
+              <DeleteOutlined />
+            </div>
           </div>
         )}
         {children}
