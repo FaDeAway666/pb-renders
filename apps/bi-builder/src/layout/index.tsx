@@ -23,7 +23,7 @@ const LayoutComp: React.FC<LayoutProps> = (props: LayoutProps) => {
       </Sider>
       <Layout>
         <Header />
-        <Content>{children}</Content>
+        <Content className="layout-content">{children}</Content>
       </Layout>
     </Layout>
   );

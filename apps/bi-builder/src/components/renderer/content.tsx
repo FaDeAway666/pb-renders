@@ -12,10 +12,12 @@ import {
   initGridArray,
   rearangeGrid,
   updateChartConfig,
+  updateGridArrayWithSpan,
 } from '@/utils/grid';
 
 import ChartPanel from '../chart/panel';
 import './content.less';
+import OptionsWrapper from '../options/options';
 
 const LayoutContent = () => {
   const config = useRendererStore((state) => state.config);
@@ -28,7 +30,7 @@ const LayoutContent = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [, forceUpdate] = useState({});
 
-  const previewPositionRef = useRef({ col: 1, row: 1 });
+  const previewPositionRef = useRef({ col: 1, row: 1, colSpan: 1, rowSpan: 1 });
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const panelRect = useRef<DOMRect>();
@@ -45,17 +47,26 @@ const LayoutContent = () => {
       if (!isDragging) setIsDragging(true);
       const { left, top } = panelRect.current!;
 
+      const chartConf = config.children.find((c) => c.key === item.key);
+
       const { row, col } = getGridLayout(
         { x: offset.x - left, y: offset.y - top },
         baseChartRect.current.colWidth,
         baseChartRect.current.rowHeight,
+        { colSpan: chartConf?.colSpan || 1, rowSpan: chartConf?.rowSpan || 1 },
+        config.colNum,
       );
       console.log(row, col);
       if (
         row !== previewPositionRef.current.row ||
         col !== previewPositionRef.current.col
       ) {
-        previewPositionRef.current = { row, col };
+        previewPositionRef.current = {
+          row,
+          col,
+          colSpan: chartConf?.colSpan || 1,
+          rowSpan: chartConf?.rowSpan || 1,
+        };
         forceUpdate({});
       }
     }
@@ -75,7 +86,7 @@ const LayoutContent = () => {
         baseChartRect.current.rowHeight,
       );
 
-      const key = uuid().slice(0, 8);
+      const key = item.id + '-' + uuid().slice(0, 8);
       charts.push({
         key,
         type: item.id as string,
@@ -83,16 +94,22 @@ const LayoutContent = () => {
         row,
         options: defaultChartOptions[item.id as ChartType],
       });
-      setCharts(charts);
 
       if (!getGridArray().length) {
         setGridArray(initGridArray(config.colNum || 3, col, row, key));
         console.log(getGridArray(), 'gridArray');
+        setCharts(charts);
       } else {
-        const rearangedArray = rearangeGrid(getGridArray(), { row, col }, key);
-        const newCharts = updateChartConfig(charts, rearangedArray);
+        const { charts: newCharts, gridArray } = rearangeGrid(
+          charts,
+          getGridArray(),
+          { row, col },
+          key,
+          config.colNum || 3,
+        );
+        // charts = updateChartConfig(charts, rearangedArray);
+        setGridArray(gridArray);
         setCharts(newCharts);
-        setGridArray(rearangedArray);
       }
     } else {
       const chartConf = charts.find((c) => c.key === item.key);
@@ -101,14 +118,23 @@ const LayoutContent = () => {
       //   charts[index].row = row;
       //   setCharts([...charts]);
       if (chartConf) {
-        const { row, col } = previewPositionRef.current;
-        const rearangedArray = rearangeGrid(getGridArray(), { row, col }, item.key, {
-          row: chartConf.row!,
-          col: chartConf.col!,
-        });
-        const newCharts = updateChartConfig(charts, rearangedArray);
+        const { row, col, rowSpan, colSpan } = previewPositionRef.current;
+        const { charts: newCharts, gridArray } = rearangeGrid(
+          charts,
+          getGridArray(),
+          { row, col, rowSpan, colSpan },
+          item.key,
+          config.colNum || 3,
+          {
+            row: chartConf.row!,
+            col: chartConf.col!,
+            rowSpan: chartConf.rowSpan!,
+            colSpan: chartConf.colSpan!,
+          },
+        );
+        // const newCharts = updateChartConfig(charts, rearangedArray);
         setCharts(newCharts);
-        setGridArray(rearangedArray);
+        setGridArray(gridArray);
       }
       // }
     }
@@ -136,6 +162,100 @@ const LayoutContent = () => {
     } else return 300;
   };
 
+  const onChartSelect = (id: string) => {
+    setSelectedId(id);
+    const chartConfig = config.children.find((item) => item.key === id);
+    if (chartConfig) {
+      previewPositionRef.current = {
+        col: chartConfig.col || 1,
+        row: chartConfig.row || 1,
+        colSpan: chartConfig.colSpan || 1,
+        rowSpan: chartConfig.rowSpan || 1,
+      };
+    }
+  };
+
+  const setSpan = (id: string) => {
+    if (!id) return;
+    const charts = config.children;
+    const chartConfig = charts.find((item) => item.key === id);
+
+    if (!chartConfig) return;
+    // chartConfig.colSpan = 2;
+    // chartConfig.rowSpan = 2;
+
+    const gridArray = getGridArray();
+    const originPosition = {
+      row: chartConfig.row!,
+      col: chartConfig.col!,
+      rowSpan: chartConfig.rowSpan || 1,
+      colSpan: chartConfig.colSpan || 1,
+    };
+    const targetPosition = { ...originPosition };
+
+    const colSpan = 2,
+      rowSpan = 2;
+    if (targetPosition.col + colSpan - 1 > gridArray[0].length) {
+      targetPosition.col = gridArray[0].length - colSpan + 1;
+    }
+    targetPosition.rowSpan = colSpan;
+    targetPosition.colSpan = rowSpan;
+
+    const { gridArray: newGridArray, charts: newCharts } = rearangeGrid(
+      charts,
+      gridArray,
+      targetPosition,
+      chartConfig.key,
+      config.colNum || 3,
+      originPosition,
+    );
+    // const gridArray = updateGridArrayWithSpan(
+    //   config.children,
+    //   getGridArray(),
+    //   {
+    //     row: chartConfig.row!,
+    //     col: chartConfig.col!,
+    //     rowSpan: chartConfig.rowSpan || 1,
+    //     colSpan: chartConfig.colSpan || 1,
+    //   },
+    //   id,
+    //   { rowSpan: 2, colSpan: 2 },
+    // );
+    setGridArray(newGridArray);
+    setCharts(newCharts);
+
+    // const charts = updateChartConfig(config.children, gridArray);
+    // console.log('updated charts', charts);
+    // setCharts(charts);
+  };
+
+  const setSpan2 = (id: string) => {
+    if (!id) return;
+    const chartConfig = config.children.find((item) => item.key === id);
+
+    if (!chartConfig) return;
+    // chartConfig.colSpan = 2;
+    // chartConfig.rowSpan = 2;
+
+    // const gridArray = updateGridArrayWithSpan(
+    //   config.children,
+    //   getGridArray(),
+    //   {
+    //     row: chartConfig.row!,
+    //     col: chartConfig.col!,
+    //     rowSpan: chartConfig.rowSpan || 1,
+    //     colSpan: chartConfig.colSpan || 1,
+    //   },
+    //   id,
+    //   { rowSpan: 1, colSpan: 2 },
+    // );
+    // setGridArray(gridArray);
+
+    // const charts = updateChartConfig(config.children, gridArray);
+    // console.log('updated charts', charts);
+    // setCharts(charts);
+  };
+
   useEffect(() => {
     if (panelRef.current && containerRef.current) {
       panelRect.current = panelRef.current.getBoundingClientRect();
@@ -149,34 +269,39 @@ const LayoutContent = () => {
     }
   }, []);
   return (
-    <div ref={panelRef} style={{ height: '100%' }}>
-      <DropBoard onDrop={onDrop} dragging={dragging}>
-        <GridRenderer ref={containerRef} config={config}>
-          {config.children.map(
-            (chart) =>
-              chartWidth !== 0 && (
-                <ChartPanel
-                  id={chart.key}
-                  selectedId={selectedId}
-                  key={chart.key}
-                  chartConfig={chart}
-                  onSelect={(id) => setSelectedId(id)}
-                >
-                  <Chart chartConfig={chart} baseRect={baseChartRect.current} />
-                </ChartPanel>
-              ),
-          )}
-          {isDragging && (
-            <div
-              className="preview-chart"
-              style={{
-                gridRow: previewPositionRef.current.row,
-                gridColumn: previewPositionRef.current.col,
-              }}
-            ></div>
-          )}
-        </GridRenderer>
-      </DropBoard>
+    <div className="content-container" ref={panelRef}>
+      {/* <button onClick={() => setSpan(selectedId)}>set span</button>
+      <button onClick={() => setSpan2(selectedId)}>set span -</button> */}
+      <div className="grid-container">
+        <DropBoard onDrop={onDrop} dragging={dragging}>
+          <GridRenderer ref={containerRef} config={config}>
+            {config.children.map(
+              (chart) =>
+                chartWidth !== 0 && (
+                  <ChartPanel
+                    id={chart.key}
+                    selectedId={selectedId}
+                    key={chart.key}
+                    chartConfig={chart}
+                    onSelect={(id) => onChartSelect(id)}
+                  >
+                    <Chart chartConfig={chart} baseRect={baseChartRect.current} />
+                  </ChartPanel>
+                ),
+            )}
+            {isDragging && (
+              <div
+                className="preview-chart"
+                style={{
+                  gridRow: `${previewPositionRef.current.row} / span ${previewPositionRef.current.rowSpan}`,
+                  gridColumn: `${previewPositionRef.current.col} / span ${previewPositionRef.current.colSpan}`,
+                }}
+              ></div>
+            )}
+          </GridRenderer>
+        </DropBoard>
+      </div>
+      <OptionsWrapper />
     </div>
   );
 };

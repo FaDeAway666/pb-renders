@@ -81,12 +81,17 @@ const Chart = (props: ChartProps) => {
       gridRow: rowSpan ? `${row} / span ${rowSpan}` : row,
       gridCol: colSpan ? `${col} / span ${colSpan}` : col,
     };
-  }, [baseRect, col, row, colSpan, colGutter, rowGutter]);
+  }, [baseRect, col, row, colSpan, rowSpan, colGutter, rowGutter]);
 
   useEffect(() => {
     const chart = echarts.init(chartRef.current);
     chart.setOption(options);
-  }, []);
+
+    console.log('init chart');
+    return () => {
+      chart.dispose();
+    };
+  }, [rowSpan, colSpan]);
 
   return <div ref={chartRef} style={{ ...chartStyle }}></div>;
 };
