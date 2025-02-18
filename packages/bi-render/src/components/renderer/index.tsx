@@ -6,7 +6,7 @@ import Chart from '../chart';
 
 import GridRenderer from './grid';
 
-import './index.module.less';
+import './index.less';
 
 const Renderer = (props: IRenderProps) => {
   const { config, mode = 'grid' } = props;
@@ -47,8 +47,7 @@ const Renderer = (props: IRenderProps) => {
         (chart) =>
           chartWidth !== 0 && (
             <Chart
-              width={chartWidth}
-              height={chart.height || getChartHeight()}
+              colNum={config.colNum || 3}
               options={chart.options}
               key={chart.key}
             />

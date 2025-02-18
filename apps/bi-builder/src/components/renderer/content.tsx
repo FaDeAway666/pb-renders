@@ -1,6 +1,6 @@
 import { GridRenderer, Chart } from '@pb-renders/bi-render';
 import { throttle } from '@pb-renders/utils';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import DropBoard from '@/components/dnd/dropBoard';
@@ -21,6 +21,7 @@ import OptionsWrapper from '../options/options';
 
 const LayoutContent = () => {
   const config = useRendererStore((state) => state.config);
+  const getConfig = useRendererStore((state) => state.getConfig);
   const getGridArray = useRendererStore((state) => state.getGridArray);
   const setGridArray = useRendererStore((state) => state.setGridArray);
   const setCharts = useRendererStore((state) => state.setChartsConfig);
@@ -33,6 +34,7 @@ const LayoutContent = () => {
   const previewPositionRef = useRef({ col: 1, row: 1, colSpan: 1, rowSpan: 1 });
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const panelRect = useRef<DOMRect>();
   const baseChartRect = useRef<{
     colWidth: number;
@@ -41,22 +43,25 @@ const LayoutContent = () => {
     colWidth: 0,
     rowHeight: 0,
   });
+  const [baseChart, setBaseChart] = useState({ colWidth: 0, rowHeight: 0 });
 
+  // dragging和onDrop两个函数存在闭包，因此都需要用ref保存状态
   const dragging = (offset: { x: number; y: number }, item: any) => {
     if (item.key) {
       if (!isDragging) setIsDragging(true);
       const { left, top } = panelRect.current!;
+      const renderConfig = getConfig();
 
-      const chartConf = config.children.find((c) => c.key === item.key);
+      const chartConf = renderConfig.children.find((c) => c.key === item.key);
 
+      const { scrollTop, scrollLeft } = gridRef.current!;
       const { row, col } = getGridLayout(
-        { x: offset.x - left, y: offset.y - top },
+        { x: offset.x + scrollLeft - left, y: offset.y + scrollTop - top },
         baseChartRect.current.colWidth,
         baseChartRect.current.rowHeight,
         { colSpan: chartConf?.colSpan || 1, rowSpan: chartConf?.rowSpan || 1 },
-        config.colNum,
+        renderConfig.colNum,
       );
-      console.log(row, col);
       if (
         row !== previewPositionRef.current.row ||
         col !== previewPositionRef.current.col
@@ -74,7 +79,8 @@ const LayoutContent = () => {
 
   const onDrop = (offset: { x: number; y: number }, item: any) => {
     setIsDragging(false);
-    const charts = config.children;
+    const renderConfig = getConfig();
+    const charts = renderConfig.children;
     console.log(offset, item);
 
     if (item.id) {
@@ -85,6 +91,7 @@ const LayoutContent = () => {
         baseChartRect.current.colWidth,
         baseChartRect.current.rowHeight,
       );
+      console.log(row, col, baseChart);
 
       const key = item.id + '-' + uuid().slice(0, 8);
       charts.push({
@@ -96,7 +103,7 @@ const LayoutContent = () => {
       });
 
       if (!getGridArray().length) {
-        setGridArray(initGridArray(config.colNum || 3, col, row, key));
+        setGridArray(initGridArray(renderConfig.colNum || 3, col, row, key));
         console.log(getGridArray(), 'gridArray');
         setCharts(charts);
       } else {
@@ -105,7 +112,7 @@ const LayoutContent = () => {
           getGridArray(),
           { row, col },
           key,
-          config.colNum || 3,
+          renderConfig.colNum || 3,
         );
         // charts = updateChartConfig(charts, rearangedArray);
         setGridArray(gridArray);
@@ -124,7 +131,7 @@ const LayoutContent = () => {
           getGridArray(),
           { row, col, rowSpan, colSpan },
           item.key,
-          config.colNum || 3,
+          renderConfig.colNum || 3,
           {
             row: chartConf.row!,
             col: chartConf.col!,
@@ -229,33 +236,6 @@ const LayoutContent = () => {
     // setCharts(charts);
   };
 
-  const setSpan2 = (id: string) => {
-    if (!id) return;
-    const chartConfig = config.children.find((item) => item.key === id);
-
-    if (!chartConfig) return;
-    // chartConfig.colSpan = 2;
-    // chartConfig.rowSpan = 2;
-
-    // const gridArray = updateGridArrayWithSpan(
-    //   config.children,
-    //   getGridArray(),
-    //   {
-    //     row: chartConfig.row!,
-    //     col: chartConfig.col!,
-    //     rowSpan: chartConfig.rowSpan || 1,
-    //     colSpan: chartConfig.colSpan || 1,
-    //   },
-    //   id,
-    //   { rowSpan: 1, colSpan: 2 },
-    // );
-    // setGridArray(gridArray);
-
-    // const charts = updateChartConfig(config.children, gridArray);
-    // console.log('updated charts', charts);
-    // setCharts(charts);
-  };
-
   useEffect(() => {
     if (panelRef.current && containerRef.current) {
       panelRect.current = panelRef.current.getBoundingClientRect();
@@ -266,14 +246,31 @@ const LayoutContent = () => {
         rowHeight: rh,
         colWidth: cw,
       };
+      setBaseChart({ rowHeight: rh, colWidth: cw });
     }
-  }, []);
+  }, [config.colNum]);
+
+  const currentItem = useMemo(() => {
+    if (selectedId === 'page')
+      return {
+        ...config,
+        children: [],
+      };
+    return config.children.find((chart) => chart.key === selectedId);
+  }, [selectedId, config]);
+
   return (
     <div className="content-container" ref={panelRef}>
       {/* <button onClick={() => setSpan(selectedId)}>set span</button>
       <button onClick={() => setSpan2(selectedId)}>set span -</button> */}
-      <div className="grid-container">
-        <DropBoard onDrop={onDrop} dragging={dragging}>
+      <div className="grid-container" ref={gridRef}>
+        <DropBoard
+          onDrop={onDrop}
+          dragging={dragging}
+          onSelect={() => {
+            setSelectedId('page');
+          }}
+        >
           <GridRenderer ref={containerRef} config={config}>
             {config.children.map(
               (chart) =>
@@ -285,7 +282,7 @@ const LayoutContent = () => {
                     chartConfig={chart}
                     onSelect={(id) => onChartSelect(id)}
                   >
-                    <Chart chartConfig={chart} baseRect={baseChartRect.current} />
+                    <Chart chartConfig={chart} baseRect={baseChart} />
                   </ChartPanel>
                 ),
             )}
@@ -301,7 +298,7 @@ const LayoutContent = () => {
           </GridRenderer>
         </DropBoard>
       </div>
-      <OptionsWrapper />
+      <OptionsWrapper config={currentItem} />
     </div>
   );
 };

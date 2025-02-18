@@ -5,9 +5,10 @@ interface DropBoardProps {
   children: React.ReactNode;
   onDrop?: (offset: { x: number; y: number }, item: unknown) => void;
   dragging?: (offset: { x: number; y: number }, item: unknown) => void;
+  onSelect?: () => void;
 }
 
-const DropBoard = ({ children, onDrop, dragging }: DropBoardProps) => {
+const DropBoard = ({ children, onDrop, dragging, onSelect }: DropBoardProps) => {
   const [states, dropRef] = useDrop(() => {
     return {
       accept: ['item', 'chart'],
@@ -34,8 +35,15 @@ const DropBoard = ({ children, onDrop, dragging }: DropBoardProps) => {
       }),
     };
   });
+  console.log('dropboard render');
   return (
-    <div className="drop-container" ref={dropRef}>
+    <div
+      className="drop-container"
+      ref={dropRef}
+      onMouseDown={() => {
+        onSelect?.();
+      }}
+    >
       {children}
     </div>
   );

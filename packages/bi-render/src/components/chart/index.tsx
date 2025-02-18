@@ -81,7 +81,7 @@ const Chart = (props: ChartProps) => {
       gridRow: rowSpan ? `${row} / span ${rowSpan}` : row,
       gridCol: colSpan ? `${col} / span ${colSpan}` : col,
     };
-  }, [baseRect, col, row, colSpan, rowSpan, colGutter, rowGutter]);
+  }, [col, row, colSpan, rowSpan, colGutter, rowGutter, baseRect]);
 
   useEffect(() => {
     const chart = echarts.init(chartRef.current);
@@ -91,7 +91,7 @@ const Chart = (props: ChartProps) => {
     return () => {
       chart.dispose();
     };
-  }, [rowSpan, colSpan]);
+  }, [rowSpan, colSpan, baseRect]);
 
   return <div ref={chartRef} style={{ ...chartStyle }}></div>;
 };

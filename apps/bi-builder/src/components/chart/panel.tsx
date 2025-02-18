@@ -33,7 +33,10 @@ const ChartPanel: React.FC<IPanelProps> = (props: IPanelProps) => {
     <DragItem type="chart" item={{ key: id }} style={{ ...gridStyle }}>
       <div
         className={`chart-panel ${isSelected ? 'panel-selected' : ''}`}
-        onMouseDown={() => onSelect(id)}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          onSelect(id);
+        }}
       >
         {isSelected && (
           <div className="icons">

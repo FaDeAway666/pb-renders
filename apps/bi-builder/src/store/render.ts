@@ -6,17 +6,21 @@ interface RendererStore {
   gridArray: (string | null)[][];
   setGridArray: (gridArray: (string | null)[][]) => void;
   getGridArray: () => (string | null)[][];
+  getConfig: () => RenderConfig;
   setPanelConfig: (config: Omit<RenderConfig, 'children'>) => void;
   setChartsConfig: (charts: ChartConfig[]) => void;
 }
 
 const useRendererStore = create<RendererStore>((set, get) => ({
   config: {
-    col: 3,
+    colNum: 3,
     padding: 20,
     colGutter: 24,
     rowGutter: 24,
     children: [],
+  },
+  getConfig: () => {
+    return get().config;
   },
   gridArray: [],
   setGridArray: (gridArray: (string | null)[][]) =>

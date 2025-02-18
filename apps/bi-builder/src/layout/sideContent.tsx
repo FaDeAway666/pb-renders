@@ -1,5 +1,5 @@
 import './sideContent.less';
-import DragItem from '@/components/dnd/dragItem.tsx';
+import DragItem from '@/components/dnd/dragItem';
 
 interface ChartDragItemProps {
   children: React.ReactNode;

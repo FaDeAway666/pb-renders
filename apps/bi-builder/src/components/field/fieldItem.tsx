@@ -1,0 +1,53 @@
+import { Input, Select, Radio, InputNumber } from 'antd';
+
+import { FieldType } from './constant';
+
+import './field.less';
+
+export const getFormItem = (
+  type: FieldType,
+  props: Record<string, any>,
+): React.ReactNode => {
+  switch (type) {
+    case FieldType.INPUT:
+      return <Input {...props} />;
+    case FieldType.INPUT_NUMBER:
+      return <InputNumber {...props} />;
+    case FieldType.RADIO_GROUP:
+      return <Radio.Group block optionType="button" buttonStyle="solid" {...props} />;
+    case FieldType.TEXTAREA:
+      return <Input.TextArea {...props} />;
+    case FieldType.SELECT:
+      return <Select {...props} />;
+    default:
+      return null;
+  }
+};
+
+interface FieldItemProps {
+  fieldConfig: {
+    type: FieldType;
+    props: Record<string, any>;
+  };
+  onChange: (value: any) => void;
+}
+
+export const FieldItem = (props: FieldItemProps) => {
+  const { fieldConfig, onChange } = props;
+  const { type, props: fieldProps } = fieldConfig;
+
+  const onItemChange = (e: any) => {
+    const value = e?.target?.value ?? e;
+
+    onChange(value);
+  };
+
+  return (
+    <div className="field-item">
+      <div className="label">{fieldProps.label}</div>
+      <div className="field-content">
+        {getFormItem(type, { ...fieldProps, onChange: onItemChange })}
+      </div>
+    </div>
+  );
+};

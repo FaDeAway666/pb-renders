@@ -2,7 +2,7 @@ import { forwardRef, useCallback } from 'react';
 
 import type { IRenderProps } from '@/types';
 
-import './index.module.less';
+import './index.less';
 
 export interface IGridRendererProps extends Omit<IRenderProps, 'mode' | 'data'> {
   children: React.ReactNode;
