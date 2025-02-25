@@ -4,13 +4,14 @@ import './index.less';
 
 interface LayoutProps {
   sidebarContent: React.ReactNode;
+  headerContent: React.ReactNode;
   children?: React.ReactNode;
 }
 
 const { Sider, Content, Header } = Layout;
 const LayoutComp: React.FC<LayoutProps> = (props: LayoutProps) => {
   const [collapsed, setCollapsed] = useState(false);
-  const { sidebarContent, children } = props;
+  const { sidebarContent, headerContent, children } = props;
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider
@@ -22,7 +23,7 @@ const LayoutComp: React.FC<LayoutProps> = (props: LayoutProps) => {
         {sidebarContent}
       </Sider>
       <Layout>
-        <Header />
+        <Header>{headerContent}</Header>
         <Content className="layout-content">{children}</Content>
       </Layout>
     </Layout>

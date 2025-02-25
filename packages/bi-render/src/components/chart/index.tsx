@@ -37,6 +37,7 @@ import {
   // SVGRenderer,
 } from 'echarts/renderers';
 import type { ECBasicOption } from 'echarts/types/dist/shared';
+import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 
 import type { ItemConfig } from '@/types';
@@ -66,8 +67,9 @@ const Chart = (props: ChartProps) => {
     rowGutter = 20,
   } = props;
 
-  const chartStyle = useMemo(() => {
+  const chartStyle = useMemo<CSSProperties>(() => {
     const chartHeight = height ? height : baseRect.rowHeight;
+    console.log(baseRect, 'chart rect');
     return {
       width: `${
         colSpan
@@ -78,7 +80,7 @@ const Chart = (props: ChartProps) => {
         rowSpan ? chartHeight * rowSpan + rowGutter * (rowSpan - 1) : chartHeight
       }px`,
       gridRow: rowSpan ? `${row} / span ${rowSpan}` : row,
-      gridCol: colSpan ? `${col} / span ${colSpan}` : col,
+      gridColumn: colSpan ? `${col} / span ${colSpan}` : col,
     };
   }, [col, row, colSpan, rowSpan, colGutter, rowGutter, baseRect, height]);
 

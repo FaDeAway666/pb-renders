@@ -12,7 +12,7 @@ const Renderer = (props: IRenderProps) => {
   const { config, mode = 'grid' } = props;
   const { colNum = 3, colGutter = 20, padding = 20, autofit } = config;
   const containerRef = useRef<HTMLDivElement>(null);
-  const [chartWidth, setChartWidth] = useState(0);
+  const [baseRect, setBaseRect] = useState({ rowHeight: 0, colWidth: 0 });
 
   const getChartWidth = useCallback(() => {
     if (containerRef.current) {
@@ -29,28 +29,44 @@ const Renderer = (props: IRenderProps) => {
     return 0;
   }, [padding, colNum, colGutter]);
 
-  const getChartHeight = useCallback(() => {
-    if (autofit) {
-      return Math.floor(chartWidth * 0.75);
-    } else return 300;
-  }, [autofit, chartWidth]);
+  const getChartHeight = useCallback(
+    (width: number) => {
+      if (autofit) {
+        return Math.floor(width * 0.75);
+      } else return 300;
+    },
+    [autofit],
+  );
 
   useEffect(() => {
     if (mode === 'grid' && containerRef.current) {
-      setChartWidth(getChartWidth());
+      const cw = getChartWidth();
+      const rh = getChartHeight(cw);
+      const rect = {
+        rowHeight: rh,
+        colWidth: cw,
+      };
+      setBaseRect(rect);
     }
-  }, []);
+  }, [colNum]);
+
+  console.log(config, 'refresh');
   return mode === 'grid' ? (
-    <GridRenderer ref={containerRef} config={config}>
+    <GridRenderer key="grid" ref={containerRef} config={config}>
       {/* <div>{JSON.stringify(config)}</div> */}
       {config.children.map(
         (chart) =>
-          chartWidth !== 0 && (
-            <Chart
-              colNum={config.colNum || 3}
-              options={chart.options}
-              key={chart.key}
-            />
+          baseRect.colWidth !== 0 && (
+            <>
+              {chart.type === 'chart' && (
+                <Chart key={chart.key} chartConfig={chart} baseRect={baseRect} />
+              )}
+              {chart.type === 'custom' && chart.customNode && (
+                <div style={{ height: chart.height }}>
+                  <chart.customNode key={chart.key} {...chart.customProps} />
+                </div>
+              )}
+            </>
           ),
       )}
     </GridRenderer>

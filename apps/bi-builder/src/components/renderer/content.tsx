@@ -1,6 +1,5 @@
 import type { ItemConfig } from '@pb-renders/bi-render';
 import { GridRenderer, Chart } from '@pb-renders/bi-render';
-import { throttle } from '@pb-renders/utils';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -304,7 +303,7 @@ const LayoutContent = () => {
                     onSelect={(id) => onChartSelect(id)}
                   >
                     {chart.type === 'chart' && (
-                      <Chart chartConfig={chart} baseRect={baseChart} />
+                      <Chart editting chartConfig={chart} baseRect={baseChart} />
                     )}
                     {chart.type === 'custom' && chart.customNode && (
                       <div style={{ height: chart.height }}>
