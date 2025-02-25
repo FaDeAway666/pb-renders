@@ -1,11 +1,21 @@
-export interface ChartConfig {
-  type: string;
+export enum ItemType {
+  CHART = 'chart',
+  CUSTOM = 'custom',
+  CONTAINER = 'container',
+}
+
+export interface ItemConfig {
+  type: ItemType;
+  id: string;
   key: string;
+  height?: number;
   col?: number;
   row?: number;
   colSpan?: number;
   rowSpan?: number;
-  options: Record<string, any>;
+  chartOptions?: Record<string, any>;
+  customNode?: (...args: any[]) => JSX.Element;
+  customProps?: Record<string, any>;
 }
 
 export interface RenderConfig {
@@ -18,7 +28,7 @@ export interface RenderConfig {
   colNum?: number;
   theme?: string;
   autofit?: boolean;
-  children: Array<ChartConfig>;
+  children: Array<ItemConfig>;
 }
 
 export interface IRenderProps {

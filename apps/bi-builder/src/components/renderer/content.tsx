@@ -1,3 +1,4 @@
+import type { ItemConfig } from '@pb-renders/bi-render';
 import { GridRenderer, Chart } from '@pb-renders/bi-render';
 import { throttle } from '@pb-renders/utils';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
@@ -6,12 +7,13 @@ import { v4 as uuid } from 'uuid';
 import DropBoard from '@/components/dnd/dropBoard';
 import type { ChartType } from '@/constant/chart';
 import { defaultChartOptions } from '@/constant/chart';
+import { customOptions } from '@/constant/custom';
 import { useRendererStore } from '@/store';
 import {
   getGridLayout,
   initGridArray,
   rearangeGrid,
-  updateChartConfig,
+  updateItemConfig,
   updateGridArrayWithSpan,
 } from '@/utils/grid';
 
@@ -31,7 +33,13 @@ const LayoutContent = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [, forceUpdate] = useState({});
 
-  const previewPositionRef = useRef({ col: 1, row: 1, colSpan: 1, rowSpan: 1 });
+  const previewPositionRef = useRef({
+    col: 1,
+    row: 1,
+    colSpan: 1,
+    rowSpan: 1,
+    height: 300,
+  });
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -71,6 +79,7 @@ const LayoutContent = () => {
           col,
           colSpan: chartConf?.colSpan || 1,
           rowSpan: chartConf?.rowSpan || 1,
+          height: (chartConf?.height || 300) * (chartConf?.rowSpan || 1),
         };
         forceUpdate({});
       }
@@ -94,13 +103,24 @@ const LayoutContent = () => {
       console.log(row, col, baseChart);
 
       const key = item.id + '-' + uuid().slice(0, 8);
-      charts.push({
+      const itemConfig: ItemConfig = {
         key,
-        type: item.id as string,
+        type: item.type,
+        id: item.id,
         col,
         row,
-        options: defaultChartOptions[item.id as ChartType],
-      });
+        rowSpan: 1,
+        colSpan: 1,
+        height: 300,
+      };
+
+      if (item.type === 'chart')
+        itemConfig.chartOptions = defaultChartOptions[item.id as ChartType];
+      else if (item.type === 'custom') {
+        itemConfig.customNode = customOptions[item.id as string].node;
+        itemConfig.customProps = customOptions[item.id as string].props;
+      }
+      charts.push(itemConfig);
 
       if (!getGridArray().length) {
         setGridArray(initGridArray(renderConfig.colNum || 3, col, row, key));
@@ -114,7 +134,7 @@ const LayoutContent = () => {
           key,
           renderConfig.colNum || 3,
         );
-        // charts = updateChartConfig(charts, rearangedArray);
+        // charts = updateItemConfig(charts, rearangedArray);
         setGridArray(gridArray);
         setCharts(newCharts);
       }
@@ -139,7 +159,7 @@ const LayoutContent = () => {
             colSpan: chartConf.colSpan!,
           },
         );
-        // const newCharts = updateChartConfig(charts, rearangedArray);
+        // const newCharts = updateItemConfig(charts, rearangedArray);
         setCharts(newCharts);
         setGridArray(gridArray);
       }
@@ -178,6 +198,7 @@ const LayoutContent = () => {
         row: chartConfig.row || 1,
         colSpan: chartConfig.colSpan || 1,
         rowSpan: chartConfig.rowSpan || 1,
+        height: (chartConfig.height || 300) * (chartConfig.rowSpan || 1),
       };
     }
   };
@@ -231,7 +252,7 @@ const LayoutContent = () => {
     setGridArray(newGridArray);
     setCharts(newCharts);
 
-    // const charts = updateChartConfig(config.children, gridArray);
+    // const charts = updateItemConfig(config.children, gridArray);
     // console.log('updated charts', charts);
     // setCharts(charts);
   };
@@ -282,7 +303,14 @@ const LayoutContent = () => {
                     chartConfig={chart}
                     onSelect={(id) => onChartSelect(id)}
                   >
-                    <Chart chartConfig={chart} baseRect={baseChart} />
+                    {chart.type === 'chart' && (
+                      <Chart chartConfig={chart} baseRect={baseChart} />
+                    )}
+                    {chart.type === 'custom' && chart.customNode && (
+                      <div style={{ height: chart.height }}>
+                        <chart.customNode {...chart.customProps} />
+                      </div>
+                    )}
                   </ChartPanel>
                 ),
             )}
@@ -292,6 +320,7 @@ const LayoutContent = () => {
                 style={{
                   gridRow: `${previewPositionRef.current.row} / span ${previewPositionRef.current.rowSpan}`,
                   gridColumn: `${previewPositionRef.current.col} / span ${previewPositionRef.current.colSpan}`,
+                  height: previewPositionRef.current.height,
                 }}
               ></div>
             )}

@@ -2,6 +2,8 @@
   position: relative;
   box-sizing: border-box;
   border: 1px solid transparent;
+  transform: translate3d(0,0,0); // 开启硬件加速，防止出现边框虚影
+  will-change: transform;
 
   .icons {
     position: absolute;
@@ -21,5 +23,5 @@
 }
 
 .panel-selected {
-  border: 1px solid blue;
+  border-color: blue;
 }

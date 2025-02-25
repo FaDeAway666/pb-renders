@@ -8,14 +8,27 @@ const ChartDragItem = ({ children }: ChartDragItemProps) => {
   return <div className="chart-drag-item">{children}</div>;
 };
 
-const SideContent = () => {
-  const data = ['bar', 'line', 3, 4, 5];
+const data = [
+  {
+    id: 'bar',
+    type: 'chart',
+  },
+  {
+    id: 'line',
+    type: 'chart',
+  },
+  {
+    id: 'custom1',
+    type: 'custom',
+  },
+];
 
+const SideContent = () => {
   return (
     <div className="sideContent-drag-wrapper">
       {data.map((item) => (
-        <DragItem key={item} item={{ id: item }} type="item">
-          <ChartDragItem>{item}</ChartDragItem>
+        <DragItem key={item.id} item={item} type="item">
+          <ChartDragItem>{item.id}</ChartDragItem>
         </DragItem>
       ))}
     </div>

@@ -1,4 +1,4 @@
-import type { ChartConfig } from '@pb-renders/bi-render';
+import type { ItemConfig } from '@pb-renders/bi-render';
 
 /**
  * 根据指针位置获取当前指针的grid位置
@@ -128,11 +128,21 @@ const findNearestFreeArea = (
   targetArray: (string | null)[][],
   rowStart: number,
   colStart: number,
+  rowSpan: number,
+  colSpan: number,
 ): { row: number; col: number } | false => {
   // 寻找最近的没有被占用的区域、优先级为上，左，右，下
   const visited: Record<string, number> = {};
+  const cloneGrid = gridArray.map((item) => [...item]);
 
-  const result = checkArea(gridArray, targetArray, rowStart, colStart, visited);
+  // 标记目标区域为不可用
+  for (let i = rowStart; i < rowStart + rowSpan; i++) {
+    for (let j = colStart; j < colStart + colSpan; j++) {
+      cloneGrid[i][j] = 'no';
+    }
+  }
+
+  const result = checkArea(cloneGrid, targetArray, rowStart, colStart, visited);
   return result;
 
   // const top = findNearestFreeArea(gridArray, targetArray, rowStart - 1, colStart,);
@@ -156,12 +166,27 @@ const createMutedArray = (
   colSpan: number,
 ): (string | null)[][] => {
   const array = Array.from({ length: rowSpan }, () => Array(colSpan).fill(null));
+  const tempArray = Array(rowSpan).fill(0);
   for (let i = 0; i < array.length; i++) {
     for (let j = 0; j < array[0].length; j++) {
       array[i][j] = gridArray[i + rowStart][j + colStart];
     }
+    if (array[i].some((item) => item !== null)) {
+      tempArray[i] = 1;
+    }
   }
-  return array;
+
+  // 如果是类似[[NULL,NULL],[KEY1,KEY2]]这种结构，需要删掉第一行全为null的数组
+  if (tempArray.every((item) => item === 0)) {
+    return array;
+  } else {
+    for (let k = 0; k < tempArray.length; k++) {
+      if (tempArray[k] === 0) {
+        array.splice(k, 1);
+      } else if (tempArray[k] === 1) break;
+    }
+    return array;
+  }
 };
 
 // 计算实际下移的距离
@@ -189,7 +214,7 @@ const getDownDistance = (
   return dis;
 };
 
-const rebuildGridArray = (charts: ChartConfig[], colNum: number) => {
+const rebuildGridArray = (charts: ItemConfig[], colNum: number) => {
   const configs = charts.toSorted((a, b) => (a.row || 1) - (b.row || 1));
   let array = [Array(colNum).fill(null)];
 
@@ -220,12 +245,12 @@ const rebuildGridArray = (charts: ChartConfig[], colNum: number) => {
 
 // 当grid需要进行扩展时，更新grid
 const udpateChartsWhileMute = (
-  charts: ChartConfig[],
+  charts: ItemConfig[],
   gridArray: (string | null)[][],
   targetPosition: { col: number; row: number; colSpan?: number; rowSpan?: number },
   realDis?: number,
   set?: Set<string>,
-): ChartConfig[] => {
+): ItemConfig[] => {
   const { col, row, colSpan = 1, rowSpan = 1 } = targetPosition;
   const tempArray: any[][] = gridArray.map((item) => [...item]);
   set = set || new Set<string>();
@@ -235,7 +260,7 @@ const udpateChartsWhileMute = (
   for (let i = row - 1; i < gridArray.length; i++) {
     for (let j = col - 1; j < col + colSpan - 1; j++) {
       if (tempArray[i][j] === null) continue;
-      let config: ChartConfig | undefined;
+      let config: ItemConfig | undefined;
       if (tempArray[i][j]?.includes('#')) {
         if (set.has(tempArray[i][j])) continue;
         set.add(tempArray[i][j]);
@@ -352,7 +377,7 @@ const getRealTargetArray = (
 };
 
 export const rearangeGrid = (
-  charts: ChartConfig[],
+  charts: ItemConfig[],
   gridArray: (string | null)[][],
   targetPosition: { col: number; row: number; colSpan?: number; rowSpan?: number },
   key: string,
@@ -390,7 +415,14 @@ export const rearangeGrid = (
   if (targetArray.some((item) => item.some((c) => c?.includes('#')))) {
     targetArray = getRealTargetArray(targetArray, row - 1, col - 1);
   }
-  const area = findNearestFreeArea(gridArray, targetArray, row - 1, col - 1);
+  const area = findNearestFreeArea(
+    gridArray,
+    targetArray,
+    row - 1,
+    col - 1,
+    rowSpan,
+    colSpan,
+  );
 
   if (area) {
     const set = new Set<string>();
@@ -412,8 +444,8 @@ export const rearangeGrid = (
         const [info] = newKey.split('#');
         const oldChart = charts.find((chart) => chart.key === info);
         if (oldChart) {
-          oldChart.row = area.row + 1;
-          oldChart.col = area.col + 1;
+          oldChart.row = area.row + i + 1;
+          oldChart.col = area.col + j + 1;
         }
       }
     }
@@ -487,8 +519,8 @@ export const rearangeGrid = (
   // }
 };
 
-export const updateChartConfig = (
-  chartOptions: ChartConfig[],
+export const updateItemConfig = (
+  chartOptions: ItemConfig[],
   gridArray: (string | null)[][],
 ) => {
   const map = new Map<string, number>();
@@ -515,7 +547,7 @@ export const updateChartConfig = (
 };
 
 export const updateGridArrayWithSpan = (
-  charts: ChartConfig[],
+  charts: ItemConfig[],
   gridArray: (string | null)[][],
   originPosition: {
     row: number;

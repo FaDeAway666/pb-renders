@@ -104,4 +104,13 @@ export const FieldMap: Record<
       step: 1,
     },
   },
+  height: {
+    category: FieldCategory.LAYOUT,
+    fieldType: FieldType.INPUT_NUMBER,
+    props: {
+      label: '高度',
+      min: 10,
+      step: 10,
+    },
+  },
 };

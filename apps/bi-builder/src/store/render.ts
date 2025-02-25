@@ -1,14 +1,17 @@
-import type { ChartConfig, RenderConfig } from '@pb-renders/bi-render';
+import type { ItemConfig, RenderConfig } from '@pb-renders/bi-render';
 import { create } from 'zustand';
 
 interface RendererStore {
   config: RenderConfig;
   gridArray: (string | null)[][];
+  rowHeightArray: number[];
+  setRowHeightArray: (rowHeightArray: number[]) => void;
+  getRowHeightArray: () => number[];
   setGridArray: (gridArray: (string | null)[][]) => void;
   getGridArray: () => (string | null)[][];
   getConfig: () => RenderConfig;
   setPanelConfig: (config: Omit<RenderConfig, 'children'>) => void;
-  setChartsConfig: (charts: ChartConfig[]) => void;
+  setChartsConfig: (charts: ItemConfig[]) => void;
 }
 
 const useRendererStore = create<RendererStore>((set, get) => ({
@@ -22,6 +25,12 @@ const useRendererStore = create<RendererStore>((set, get) => ({
   getConfig: () => {
     return get().config;
   },
+  rowHeightArray: [],
+  getRowHeightArray: () => {
+    return get().rowHeightArray;
+  },
+  setRowHeightArray: (rowHeightArray: number[]) =>
+    set(() => ({ rowHeightArray: [...rowHeightArray] })),
   gridArray: [],
   setGridArray: (gridArray: (string | null)[][]) =>
     set(() => {
@@ -33,7 +42,7 @@ const useRendererStore = create<RendererStore>((set, get) => ({
   },
   setPanelConfig: (config) =>
     set((state) => ({ config: { ...config, children: state.config.children } })),
-  setChartsConfig: (charts: ChartConfig[]) =>
+  setChartsConfig: (charts: ItemConfig[]) =>
     set((state) => ({ config: { ...state.config, children: charts } })),
 }));
 

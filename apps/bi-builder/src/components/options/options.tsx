@@ -1,4 +1,4 @@
-import type { ChartConfig, RenderConfig } from '@pb-renders/bi-render';
+import type { ItemConfig, RenderConfig } from '@pb-renders/bi-render';
 import './options.less';
 import { Collapse } from 'antd';
 
@@ -9,10 +9,10 @@ import type { FieldCategory } from '../field/constant';
 import { FieldItem } from '../field/fieldItem';
 import { formatFields } from '../field/utils';
 
-export type OptionsConfig = ChartConfig | Omit<RenderConfig, 'children'>;
+export type OptionsConfig = ItemConfig | Omit<RenderConfig, 'children'>;
 
 interface OptionsWrapperProps {
-  config?: ChartConfig | Omit<RenderConfig, 'children'>;
+  config?: ItemConfig | Omit<RenderConfig, 'children'>;
 }
 
 const rearrangeKeys = ['row', 'col', 'rowSpan', 'colSpan'];
@@ -26,19 +26,19 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
 
   const fieldConfigs = config ? formatFields(config, renderConfig) : {};
 
-  const updateGridArray = (chartConfig: ChartConfig, state: Record<string, number>) => {
+  const updateGridArray = (itemConfig: ItemConfig, state: Record<string, number>) => {
     const charts = renderConfig.children;
 
-    if (!chartConfig) return;
-    // chartConfig.colSpan = 2;
-    // chartConfig.rowSpan = 2;
+    if (!itemConfig) return;
+    // itemConfig.colSpan = 2;
+    // itemConfig.rowSpan = 2;
 
     const gridArray = getGridArray();
     const originPosition = {
-      row: chartConfig.row!,
-      col: chartConfig.col!,
-      rowSpan: chartConfig.rowSpan || 1,
-      colSpan: chartConfig.colSpan || 1,
+      row: itemConfig.row!,
+      col: itemConfig.col!,
+      rowSpan: itemConfig.rowSpan || 1,
+      colSpan: itemConfig.colSpan || 1,
     };
     const targetPosition = { ...originPosition, ...state };
     console.log(originPosition, targetPosition, 'positions');
@@ -52,7 +52,7 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
       charts,
       gridArray,
       targetPosition,
-      chartConfig.key,
+      itemConfig.key,
       renderConfig.colNum || 3,
       originPosition,
     );
@@ -60,10 +60,10 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
     //   config.children,
     //   getGridArray(),
     //   {
-    //     row: chartConfig.row!,
-    //     col: chartConfig.col!,
-    //     rowSpan: chartConfig.rowSpan || 1,
-    //     colSpan: chartConfig.colSpan || 1,
+    //     row: itemConfig.row!,
+    //     col: itemConfig.col!,
+    //     rowSpan: itemConfig.rowSpan || 1,
+    //     colSpan: itemConfig.colSpan || 1,
     //   },
     //   id,
     //   { rowSpan: 2, colSpan: 2 },
@@ -71,7 +71,7 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
     setGridArray(newGridArray);
     setCharts(newCharts);
 
-    // const charts = updateChartConfig(config.children, gridArray);
+    // const charts = updateItemConfig(config.children, gridArray);
     // console.log('updated charts', charts);
     // setCharts(charts);
   };
@@ -84,7 +84,7 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
     } else {
       const charts = renderConfig.children;
       const index = charts.findIndex(
-        (chart) => chart.key === (config as ChartConfig).key,
+        (chart) => chart.key === (config as ItemConfig).key,
       );
       if (index > -1) {
         if (rearrangeKeys.includes(key)) {

@@ -1,5 +1,5 @@
 import { DeleteOutlined, CopyOutlined } from '@ant-design/icons';
-import type { ChartConfig } from '@pb-renders/bi-render';
+import type { ItemConfig } from '@pb-renders/bi-render';
 import { useMemo } from 'react';
 
 import DragItem from '../dnd/dragItem';
@@ -10,7 +10,7 @@ interface IPanelProps {
   selectedId: string;
   chartDragging?: boolean;
   children: React.ReactNode;
-  chartConfig: ChartConfig;
+  chartConfig: ItemConfig;
   onSelect: (id: string) => void;
   onDelete?: (id: string) => void;
   onCopy?: (id: string) => void;
