@@ -11,7 +11,13 @@ export interface IGridRendererProps extends Omit<IRenderProps, 'mode' | 'data'> 
 const GridRenderer = forwardRef<HTMLDivElement, IGridRendererProps>(
   (props: IGridRendererProps, ref) => {
     const { config, children } = props;
-    const { colNum = 3, colGutter = 20, rowGutter = 20, padding = 20 } = config;
+    const {
+      colNum = 3,
+      colGutter = 20,
+      rowGutter = 20,
+      padding = 20,
+      background,
+    } = config;
 
     const getPaddingStyle = useCallback(() => {
       if (typeof padding === 'number') {
@@ -33,7 +39,11 @@ const GridRenderer = forwardRef<HTMLDivElement, IGridRendererProps>(
       <div
         ref={ref}
         className={`chart-render-container display-grid column-${colNum}`}
-        style={{ gap: `${colGutter}px ${rowGutter}px`, padding: getPaddingStyle() }}
+        style={{
+          gap: `${colGutter}px ${rowGutter}px`,
+          padding: getPaddingStyle(),
+          background,
+        }}
       >
         {children}
         {/* <div>{JSON.stringify(config)}</div> */}

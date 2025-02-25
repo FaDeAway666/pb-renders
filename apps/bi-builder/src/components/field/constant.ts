@@ -1,13 +1,13 @@
 export enum FieldCategory {
   PAGE = 'page',
   LAYOUT = 'layout',
-  STYLE = 'style',
+  PAGE_STYLE = 'page-style',
 }
 
 export const CategoryName = {
   [FieldCategory.PAGE]: '页面',
   [FieldCategory.LAYOUT]: '布局',
-  [FieldCategory.STYLE]: '样式',
+  [FieldCategory.PAGE_STYLE]: '样式',
 };
 
 export enum FieldType {
@@ -18,6 +18,7 @@ export enum FieldType {
   SLIDER = 'slider',
   TEXTAREA = 'textarea',
   RADIO_GROUP = 'radio-group',
+  COLOR = 'color',
 }
 
 export const FieldMap: Record<
@@ -58,6 +59,22 @@ export const FieldMap: Record<
       label: '行间距',
       min: 10,
       step: 5,
+    },
+  },
+  padding: {
+    category: FieldCategory.PAGE_STYLE,
+    fieldType: FieldType.INPUT_NUMBER,
+    props: {
+      label: '页边距',
+      min: 10,
+      step: 5,
+    },
+  },
+  background: {
+    category: FieldCategory.PAGE_STYLE,
+    fieldType: FieldType.COLOR,
+    props: {
+      label: '背景色',
     },
   },
   col: {

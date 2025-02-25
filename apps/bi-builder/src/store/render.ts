@@ -20,6 +20,7 @@ const useRendererStore = create<RendererStore>((set, get) => ({
     padding: 20,
     colGutter: 24,
     rowGutter: 24,
+    background: '#fcfcfc',
     children: [],
   },
   getConfig: () => {

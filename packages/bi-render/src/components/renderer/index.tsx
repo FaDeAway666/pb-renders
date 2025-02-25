@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { IRenderProps } from '@/types';
 
 import Chart from '../chart';
+import CustomEle from '../chart/custom';
 
 import GridRenderer from './grid';
 
@@ -61,10 +62,8 @@ const Renderer = (props: IRenderProps) => {
               {chart.type === 'chart' && (
                 <Chart key={chart.key} chartConfig={chart} baseRect={baseRect} />
               )}
-              {chart.type === 'custom' && chart.customNode && (
-                <div style={{ height: chart.height }}>
-                  <chart.customNode key={chart.key} {...chart.customProps} />
-                </div>
+              {chart.type === 'custom' && (
+                <CustomEle key={chart.key} chartConfig={chart} baseRect={baseRect} />
               )}
             </>
           ),

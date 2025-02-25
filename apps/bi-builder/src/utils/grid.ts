@@ -14,7 +14,7 @@ export const getGridLayout = (
   span?: { colSpan: number; rowSpan: number },
   colNum?: number,
 ) => {
-  const colMax = colNum || 3 - (span?.colSpan || 1) + 1;
+  const colMax = (colNum || 3) - (span?.colSpan || 1) + 1;
   const colIndex = Math.floor(position.x / colWidth) + 1;
   return {
     col: colIndex <= colMax ? colIndex : colMax,

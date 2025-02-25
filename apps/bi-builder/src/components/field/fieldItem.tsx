@@ -1,8 +1,9 @@
-import { Input, Select, Radio, InputNumber } from 'antd';
+import { Input, Select, Radio, InputNumber, ColorPicker } from 'antd';
 
 import { FieldType } from './constant';
 
 import './field.less';
+import { AggregationColor } from 'antd/es/color-picker/color';
 
 export const getFormItem = (
   type: FieldType,
@@ -19,6 +20,8 @@ export const getFormItem = (
       return <Input.TextArea {...props} />;
     case FieldType.SELECT:
       return <Select {...props} />;
+    case FieldType.COLOR:
+      return <ColorPicker format="hex" {...props} />;
     default:
       return null;
   }
@@ -37,9 +40,12 @@ export const FieldItem = (props: FieldItemProps) => {
   const { type, props: fieldProps } = fieldConfig;
 
   const onItemChange = (e: any) => {
-    const value = e?.target?.value ?? e;
-
-    onChange(value);
+    console.log(e, 'onchange');
+    if (e instanceof AggregationColor) {
+      onChange(e.toHexString());
+    } else if (e.target?.value) {
+      onChange(e.target.value);
+    } else onChange(e);
   };
 
   return (

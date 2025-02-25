@@ -78,7 +78,7 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
 
   const onFieldChange = (type: string, key: string, value: any) => {
     console.log('onFieldChange', key, value);
-    if (type === 'page') {
+    if (type === 'page' || type === 'page-style') {
       (renderConfig as Record<string, any>)[key] = value;
       setPanelConfig(renderConfig);
     } else {

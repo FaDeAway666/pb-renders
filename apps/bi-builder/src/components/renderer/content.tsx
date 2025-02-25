@@ -62,6 +62,7 @@ const LayoutContent = () => {
       const chartConf = renderConfig.children.find((c) => c.key === item.key);
 
       const { scrollTop, scrollLeft } = gridRef.current!;
+      console.log(chartConf?.colSpan);
       const { row, col } = getGridLayout(
         { x: offset.x + scrollLeft - left, y: offset.y + scrollTop - top },
         baseChartRect.current.colWidth,
@@ -303,7 +304,7 @@ const LayoutContent = () => {
                     onSelect={(id) => onChartSelect(id)}
                   >
                     {chart.type === 'chart' && (
-                      <Chart editting chartConfig={chart} baseRect={baseChart} />
+                      <Chart chartConfig={chart} baseRect={baseChart} />
                     )}
                     {chart.type === 'custom' && chart.customNode && (
                       <div style={{ height: chart.height }}>
