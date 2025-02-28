@@ -214,7 +214,7 @@ const getDownDistance = (
   return dis;
 };
 
-const rebuildGridArray = (charts: ItemConfig[], colNum: number) => {
+export const rebuildGridArray = (charts: ItemConfig[], colNum: number) => {
   const configs = charts.toSorted((a, b) => (a.row || 1) - (b.row || 1));
   let array = [Array(colNum).fill(null)];
 
@@ -238,6 +238,15 @@ const rebuildGridArray = (charts: ItemConfig[], colNum: number) => {
       }
     }
     // array[row! - 1][col! - 1] = newKey;
+  }
+
+  // 如果新增了不必要的行，把他移除掉
+  for (let r = array.length - 1; r >= 0; r--) {
+    if (array[r].every((item) => !item)) {
+      array.pop();
+    } else {
+      break;
+    }
   }
 
   return array;
@@ -465,14 +474,6 @@ export const rearangeGrid = (
     gridArray = rebuildGridArray(charts, colNum);
     // console.log(newGridArray, 'update while mute array');
     // fillGridArray(gridArray, col, row, key, colSpan, rowSpan);
-  }
-  // 如果新增了不必要的行，把他移除掉
-  for (let r = gridArray.length - 1; r >= 0; r--) {
-    if (gridArray[r].every((item) => !item)) {
-      gridArray.pop();
-    } else {
-      break;
-    }
   }
 
   return {

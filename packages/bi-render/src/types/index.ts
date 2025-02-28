@@ -34,5 +34,6 @@ export interface RenderConfig {
 export interface IRenderProps {
   config: RenderConfig;
   mode: 'grid' | 'free';
-  data: Record<string, () => unknown>;
+  data?: Record<string, () => Promise<unknown>>;
+  dataLabelMap?: Record<string, string>;
 }

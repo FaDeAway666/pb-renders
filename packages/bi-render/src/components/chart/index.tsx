@@ -51,7 +51,7 @@ echarts.use([
   CanvasRenderer,
 ]);
 
-interface ChartProps {
+export interface ChartProps {
   baseRect: { colWidth: number; rowHeight: number };
   chartConfig: ItemConfig;
   colGutter?: number;
@@ -62,7 +62,7 @@ const Chart = (props: ChartProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const {
     baseRect,
-    chartConfig: { chartOptions, row, col, rowSpan, colSpan, height },
+    chartConfig: { chartOptions, rowSpan, colSpan, height },
     colGutter = 20,
     rowGutter = 20,
   } = props;
@@ -79,10 +79,8 @@ const Chart = (props: ChartProps) => {
       height: `${
         rowSpan ? chartHeight * rowSpan + rowGutter * (rowSpan - 1) : chartHeight
       }px`,
-      gridRow: rowSpan ? `${row} / span ${rowSpan}` : row,
-      gridColumn: colSpan ? `${col} / span ${colSpan}` : col,
     };
-  }, [col, row, colSpan, rowSpan, colGutter, rowGutter, baseRect, height]);
+  }, [colSpan, rowSpan, colGutter, rowGutter, baseRect, height]);
 
   useEffect(() => {
     const chart = echarts.init(chartRef.current);
@@ -92,7 +90,7 @@ const Chart = (props: ChartProps) => {
     return () => {
       chart.dispose();
     };
-  }, [rowSpan, colSpan, baseRect, height]);
+  }, [rowSpan, colSpan, baseRect, height, chartOptions]);
 
   return <div ref={chartRef} style={{ ...chartStyle }}></div>;
 };

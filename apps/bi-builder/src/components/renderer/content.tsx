@@ -1,6 +1,6 @@
 import type { ItemConfig } from '@pb-renders/bi-render';
-import { GridRenderer, Chart } from '@pb-renders/bi-render';
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { GridRenderer, Chart, CustomEle } from '@pb-renders/bi-render';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import DropBoard from '@/components/dnd/dropBoard';
@@ -12,9 +12,9 @@ import {
   getGridLayout,
   initGridArray,
   rearangeGrid,
-  updateItemConfig,
-  updateGridArrayWithSpan,
+  rebuildGridArray,
 } from '@/utils/grid';
+import { deepClone } from '@/utils/json';
 
 import ChartPanel from '../chart/panel';
 import './content.less';
@@ -111,7 +111,7 @@ const LayoutContent = () => {
         row,
         rowSpan: 1,
         colSpan: 1,
-        height: 300,
+        height: baseChartRect.current.rowHeight,
       };
 
       if (item.type === 'chart')
@@ -203,58 +203,37 @@ const LayoutContent = () => {
     }
   };
 
-  const setSpan = (id: string) => {
-    if (!id) return;
-    const charts = config.children;
+  const onChartDelete = (id: string) => {
+    const charts = config.children.filter((item) => item.key !== id);
+    setCharts(charts);
+    const gridArray = rebuildGridArray(charts, config.colNum || 3);
+    setGridArray(gridArray);
+  };
+
+  const onChartCopy = (id: string) => {
+    const renderConfig = getConfig();
+    const charts = renderConfig.children;
     const chartConfig = charts.find((item) => item.key === id);
-
     if (!chartConfig) return;
-    // chartConfig.colSpan = 2;
-    // chartConfig.rowSpan = 2;
-
-    const gridArray = getGridArray();
-    const originPosition = {
-      row: chartConfig.row!,
-      col: chartConfig.col!,
-      rowSpan: chartConfig.rowSpan || 1,
-      colSpan: chartConfig.colSpan || 1,
-    };
-    const targetPosition = { ...originPosition };
-
-    const colSpan = 2,
-      rowSpan = 2;
-    if (targetPosition.col + colSpan - 1 > gridArray[0].length) {
-      targetPosition.col = gridArray[0].length - colSpan + 1;
-    }
-    targetPosition.rowSpan = colSpan;
-    targetPosition.colSpan = rowSpan;
-
-    const { gridArray: newGridArray, charts: newCharts } = rearangeGrid(
+    const newKey = chartConfig.id + `-${uuid().slice(0, 8)}`;
+    const newConfig = deepClone(chartConfig);
+    newConfig.key = newKey;
+    charts.push(newConfig);
+    const { charts: newCharts, gridArray } = rearangeGrid(
       charts,
-      gridArray,
-      targetPosition,
-      chartConfig.key,
-      config.colNum || 3,
-      originPosition,
+      getGridArray(),
+      {
+        row: newConfig.row!,
+        col: newConfig.col!,
+        rowSpan: newConfig.rowSpan,
+        colSpan: newConfig.colSpan,
+      },
+      newKey,
+      renderConfig.colNum || 3,
     );
-    // const gridArray = updateGridArrayWithSpan(
-    //   config.children,
-    //   getGridArray(),
-    //   {
-    //     row: chartConfig.row!,
-    //     col: chartConfig.col!,
-    //     rowSpan: chartConfig.rowSpan || 1,
-    //     colSpan: chartConfig.colSpan || 1,
-    //   },
-    //   id,
-    //   { rowSpan: 2, colSpan: 2 },
-    // );
-    setGridArray(newGridArray);
+    // charts = updateItemConfig(charts, rearangedArray);
+    setGridArray(gridArray);
     setCharts(newCharts);
-
-    // const charts = updateItemConfig(config.children, gridArray);
-    // console.log('updated charts', charts);
-    // setCharts(charts);
   };
 
   useEffect(() => {
@@ -302,14 +281,14 @@ const LayoutContent = () => {
                     key={chart.key}
                     chartConfig={chart}
                     onSelect={(id) => onChartSelect(id)}
+                    onDelete={(id) => onChartDelete(id)}
+                    onCopy={(id) => onChartCopy(id)}
                   >
                     {chart.type === 'chart' && (
                       <Chart chartConfig={chart} baseRect={baseChart} />
                     )}
-                    {chart.type === 'custom' && chart.customNode && (
-                      <div style={{ height: chart.height }}>
-                        <chart.customNode {...chart.customProps} />
-                      </div>
+                    {chart.type === 'custom' && (
+                      <CustomEle chartConfig={chart} baseRect={baseChart} />
                     )}
                   </ChartPanel>
                 ),

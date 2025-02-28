@@ -2,15 +2,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { IRenderProps } from '@/types';
 
-import Chart from '../chart';
 import CustomEle from '../chart/custom';
+import ChartWrapper from '../wrapper/chart-wrapper';
 
 import GridRenderer from './grid';
 
 import './index.less';
 
 const Renderer = (props: IRenderProps) => {
-  const { config, mode = 'grid' } = props;
+  const { config, mode = 'grid', data, dataLabelMap } = props;
   const { colNum = 3, colGutter = 20, padding = 20, autofit } = config;
   const containerRef = useRef<HTMLDivElement>(null);
   const [baseRect, setBaseRect] = useState({ rowHeight: 0, colWidth: 0 });
@@ -51,7 +51,6 @@ const Renderer = (props: IRenderProps) => {
     }
   }, [colNum]);
 
-  console.log(config, 'refresh');
   return mode === 'grid' ? (
     <GridRenderer key="grid" ref={containerRef} config={config}>
       {/* <div>{JSON.stringify(config)}</div> */}
@@ -60,7 +59,13 @@ const Renderer = (props: IRenderProps) => {
           baseRect.colWidth !== 0 && (
             <>
               {chart.type === 'chart' && (
-                <Chart key={chart.key} chartConfig={chart} baseRect={baseRect} />
+                <ChartWrapper
+                  key={chart.key}
+                  chartConfig={chart}
+                  baseRect={baseRect}
+                  dataFetch={data?.[chart.id]}
+                  dataLabelMap={dataLabelMap}
+                />
               )}
               {chart.type === 'custom' && (
                 <CustomEle key={chart.key} chartConfig={chart} baseRect={baseRect} />

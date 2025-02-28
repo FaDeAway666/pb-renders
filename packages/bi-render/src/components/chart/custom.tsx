@@ -1,14 +1,7 @@
 import type { CSSProperties } from 'react';
 import { useMemo, useRef } from 'react';
 
-import type { ItemConfig } from '@/types';
-
-interface ChartProps {
-  baseRect: { colWidth: number; rowHeight: number };
-  chartConfig: ItemConfig;
-  colGutter?: number;
-  rowGutter?: number;
-}
+import type { ChartProps } from '.';
 
 const CustomEle = (props: ChartProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
