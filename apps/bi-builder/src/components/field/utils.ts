@@ -1,4 +1,4 @@
-import type { RenderConfig } from '@pb-renders/bi-render';
+import type { RenderConfig } from 'pb-bi-render';
 import type { ReactNode } from 'react';
 
 import type { OptionsConfig } from '../options/options';

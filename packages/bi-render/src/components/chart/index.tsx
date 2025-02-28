@@ -1,4 +1,4 @@
-import { BarChart, LineChart } from 'echarts/charts';
+import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import {
   // GridSimpleComponent,
   GridComponent,
@@ -48,6 +48,7 @@ echarts.use([
   GridComponent,
   BarChart,
   LineChart,
+  PieChart,
   CanvasRenderer,
 ]);
 

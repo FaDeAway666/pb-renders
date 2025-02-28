@@ -1,4 +1,4 @@
-import type { ItemConfig } from '@pb-renders/bi-render';
+import type { ItemConfig } from 'pb-bi-render';
 
 /**
  * 根据指针位置获取当前指针的grid位置

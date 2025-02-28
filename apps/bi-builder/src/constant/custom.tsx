@@ -1,5 +1,14 @@
 const CustomNode1 = ({ text }: { text: string }) => {
-  return <div>{text}</div>;
+  return (
+    <div>
+      {text}
+      <p>123</p>
+      <p>123</p>
+      <p>123</p>
+      <p>123</p>
+      <p>123</p>
+    </div>
+  );
 };
 
 export const customOptions: Record<

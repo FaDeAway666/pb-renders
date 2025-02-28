@@ -13,17 +13,9 @@ const CustomEle = (props: ChartProps) => {
   } = props;
 
   const chartStyle = useMemo<CSSProperties>(() => {
-    const chartHeight = height ? height : baseRect.rowHeight;
     console.log(baseRect, 'chart rect');
     return {
-      width: `${
-        colSpan
-          ? baseRect.colWidth * colSpan + colGutter * (colSpan - 1)
-          : baseRect.colWidth
-      }px`,
-      height: `${
-        rowSpan ? chartHeight * rowSpan + rowGutter * (rowSpan - 1) : chartHeight
-      }px`,
+      height: height ? height : 'auto',
       gridRow: rowSpan ? `${row} / span ${rowSpan}` : row,
       gridColumn: colSpan ? `${col} / span ${colSpan}` : col,
     };

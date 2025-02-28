@@ -1,4 +1,4 @@
-import type { ItemConfig, RenderConfig } from '@pb-renders/bi-render';
+import type { ItemConfig, RenderConfig } from 'pb-bi-render';
 import { create } from 'zustand';
 
 interface RendererStore {

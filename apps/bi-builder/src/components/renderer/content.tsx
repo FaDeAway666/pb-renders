@@ -1,5 +1,5 @@
-import type { ItemConfig } from '@pb-renders/bi-render';
-import { GridRenderer, Chart, CustomEle } from '@pb-renders/bi-render';
+import type { ItemConfig } from 'pb-bi-render';
+import { GridRenderer, Chart, CustomEle } from 'pb-bi-render';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -119,6 +119,7 @@ const LayoutContent = () => {
       else if (item.type === 'custom') {
         itemConfig.customNode = customOptions[item.id as string].node;
         itemConfig.customProps = customOptions[item.id as string].props;
+        itemConfig.height = undefined;
       }
       charts.push(itemConfig);
 

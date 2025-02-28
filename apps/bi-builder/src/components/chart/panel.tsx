@@ -1,5 +1,5 @@
 import { DeleteOutlined, CopyOutlined } from '@ant-design/icons';
-import type { ItemConfig } from '@pb-renders/bi-render';
+import type { ItemConfig } from 'pb-bi-render';
 import { useMemo } from 'react';
 
 import DragItem from '../dnd/dragItem';

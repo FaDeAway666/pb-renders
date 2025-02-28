@@ -1,5 +1,5 @@
-import { Renderer } from '@pb-renders/bi-render';
 import { Button, message, Modal, Space } from 'antd';
+import { Renderer } from 'pb-bi-render';
 import { useState } from 'react';
 
 import { useRendererStore } from '@/store';
