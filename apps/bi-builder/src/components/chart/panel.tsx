@@ -20,14 +20,15 @@ const ChartPanel: React.FC<IPanelProps> = (props: IPanelProps) => {
   const { children, id, selectedId, onSelect, onCopy, onDelete, chartConfig } = props;
   const isSelected = useMemo(() => id === selectedId, [id, selectedId]);
 
-  const { row, col, rowSpan, colSpan } = chartConfig;
+  const { row, col, rowSpan, colSpan, itemBackground } = chartConfig;
   console.log(chartConfig, 'chartconfig');
   const gridStyle = useMemo(
     () => ({
       gridRow: rowSpan ? `${row} / span ${rowSpan}` : row,
       gridColumn: colSpan ? `${col} / span ${colSpan}` : col,
+      background: itemBackground,
     }),
-    [row, col, rowSpan, colSpan],
+    [row, col, rowSpan, colSpan, itemBackground],
   );
   return (
     <DragItem type="chart" item={{ key: id }} style={{ ...gridStyle }}>

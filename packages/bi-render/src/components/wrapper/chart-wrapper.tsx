@@ -23,7 +23,7 @@ const ChartWrapper = (props: ChartWrapperProps) => {
   const [loading, setLoading] = useState(false);
 
   const {
-    chartConfig: { row, col, rowSpan, colSpan },
+    chartConfig: { row, col, rowSpan, colSpan, itemBackground },
     colGutter = 20,
     rowGutter = 20,
   } = props;
@@ -32,8 +32,9 @@ const ChartWrapper = (props: ChartWrapperProps) => {
     return {
       gridRow: rowSpan ? `${row} / span ${rowSpan}` : row,
       gridColumn: colSpan ? `${col} / span ${colSpan}` : col,
+      background: itemBackground,
     };
-  }, [col, row, colSpan, rowSpan]);
+  }, [col, row, colSpan, rowSpan, itemBackground]);
 
   useEffect(() => {
     if (dataFetch) {

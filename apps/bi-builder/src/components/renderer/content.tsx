@@ -112,6 +112,7 @@ const LayoutContent = () => {
         rowSpan: 1,
         colSpan: 1,
         height: baseChartRect.current.rowHeight,
+        itemBackground: '#fff',
       };
 
       if (item.type === 'chart')

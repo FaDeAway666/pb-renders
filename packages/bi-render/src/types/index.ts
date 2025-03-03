@@ -13,6 +13,7 @@ export interface ItemConfig {
   row?: number;
   colSpan?: number;
   rowSpan?: number;
+  itemBackground?: string;
   chartOptions?: Record<string, any>;
   customNode?: (...args: any[]) => JSX.Element;
   customProps?: Record<string, any>;
