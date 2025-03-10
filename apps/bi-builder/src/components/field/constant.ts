@@ -2,18 +2,12 @@ export enum FieldCategory {
   PAGE = 'page',
   LAYOUT = 'layout',
   PAGE_STYLE = 'page-style',
-  CHART_AXIS = 'chart-axis',
-  CHART_INFO = 'chart-info',
-  CHART_SERIES = 'chart-series',
 }
 
 export const CategoryName = {
   [FieldCategory.PAGE]: '页面',
   [FieldCategory.LAYOUT]: '布局',
   [FieldCategory.PAGE_STYLE]: '样式',
-  [FieldCategory.CHART_AXIS]: '坐标轴',
-  [FieldCategory.CHART_INFO]: '图表信息',
-  [FieldCategory.CHART_SERIES]: '图表数据',
 };
 
 export enum FieldType {
@@ -25,6 +19,7 @@ export enum FieldType {
   TEXTAREA = 'textarea',
   RADIO_GROUP = 'radio-group',
   COLOR = 'color',
+  SWITCH = 'switch',
 }
 
 export const FieldMap: Record<

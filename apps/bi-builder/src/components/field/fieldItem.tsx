@@ -1,4 +1,4 @@
-import { Input, Select, Radio, InputNumber, ColorPicker } from 'antd';
+import { Input, Select, Radio, InputNumber, ColorPicker, Switch } from 'antd';
 
 import { FieldType } from './constant';
 
@@ -22,6 +22,8 @@ export const getFormItem = (
       return <Select {...props} />;
     case FieldType.COLOR:
       return <ColorPicker format="hex" {...props} />;
+    case FieldType.SWITCH:
+      return <Switch {...props} />;
     default:
       return null;
   }
@@ -38,13 +40,24 @@ interface FieldItemProps {
 export const FieldItem = (props: FieldItemProps) => {
   const { fieldConfig, onChange } = props;
   const { type, props: fieldProps } = fieldConfig;
+  let timeOut: unknown | null = null;
+
+  const debounceOnChange = (e: any) => {
+    if (timeOut) {
+      clearTimeout(timeOut as number);
+    }
+    timeOut = setTimeout(() => {
+      onChange(e);
+    }, 300);
+  };
 
   const onItemChange = (e: any) => {
     console.log(e, 'onchange');
+
     if (e instanceof AggregationColor) {
       onChange(e.toHexString());
-    } else if (e.target?.value) {
-      onChange(e.target.value);
+    } else if (e?.target?.value !== undefined) {
+      debounceOnChange(e?.target.value);
     } else onChange(e);
   };
 

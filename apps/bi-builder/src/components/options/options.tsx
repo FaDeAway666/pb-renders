@@ -7,12 +7,12 @@ import { rearangeGrid } from '@/utils/grid';
 
 import type { FieldCategory } from '../field/constant';
 import { FieldItem } from '../field/fieldItem';
-import { formatFields } from '../field/utils';
+import { formatFields, setValueByPath } from '../field/utils';
 
-export type OptionsConfig = ItemConfig | Omit<RenderConfig, 'children'>;
+export type OptionsConfig = ItemConfig & Omit<RenderConfig, 'children'>;
 
 interface OptionsWrapperProps {
-  config?: ItemConfig | Omit<RenderConfig, 'children'>;
+  config?: OptionsConfig;
 }
 
 const rearrangeKeys = ['row', 'col', 'rowSpan', 'colSpan'];
@@ -100,6 +100,24 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
     }
   };
 
+  const onChartFieldChange = (value: any, path: string) => {
+    const charts = renderConfig.children;
+    const index = charts.findIndex((chart) => chart.key === (config as ItemConfig).key);
+    if (index > -1) {
+      const newOptions = setValueByPath(value, path, charts[index].chartOptions!);
+      charts[index].chartOptions = { ...newOptions };
+      setCharts(charts);
+    }
+  };
+
+  const dispatchChange = (type: string, value: any, item: Record<string, any>) => {
+    if (item.keyPath) {
+      onChartFieldChange(value, item.keyPath);
+    } else {
+      onFieldChange(type, item.name, value);
+    }
+  };
+
   const generateFieldList = (
     fConfigs: Partial<
       Record<
@@ -125,7 +143,7 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
           <div>
             {fConfigs[key as FieldCategory]!.children.map((child) => (
               <FieldItem
-                key={child.name}
+                key={child.name || child.keyPath}
                 fieldConfig={{
                   type: child.fieldType,
                   props:
@@ -133,7 +151,7 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
                       ? child.props(renderConfig.colNum)
                       : child.props,
                 }}
-                onChange={(value) => onFieldChange(key, child.name, value)}
+                onChange={(value) => dispatchChange(key, value, child)}
               />
             ))}
           </div>
