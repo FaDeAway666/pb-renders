@@ -40,16 +40,6 @@ interface FieldItemProps {
 export const FieldItem = (props: FieldItemProps) => {
   const { fieldConfig, onChange } = props;
   const { type, props: fieldProps } = fieldConfig;
-  let timeOut: unknown | null = null;
-
-  const debounceOnChange = (e: any) => {
-    if (timeOut) {
-      clearTimeout(timeOut as number);
-    }
-    timeOut = setTimeout(() => {
-      onChange(e);
-    }, 300);
-  };
 
   const onItemChange = (e: any) => {
     console.log(e, 'onchange');
@@ -57,7 +47,7 @@ export const FieldItem = (props: FieldItemProps) => {
     if (e instanceof AggregationColor) {
       onChange(e.toHexString());
     } else if (e?.target?.value !== undefined) {
-      debounceOnChange(e?.target.value);
+      onChange(e?.target.value);
     } else onChange(e);
   };
 

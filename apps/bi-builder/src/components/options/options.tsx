@@ -110,12 +110,18 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
     }
   };
 
+  let timeOut: unknown | null = null;
   const dispatchChange = (type: string, value: any, item: Record<string, any>) => {
-    if (item.keyPath) {
-      onChartFieldChange(value, item.keyPath);
-    } else {
-      onFieldChange(type, item.name, value);
+    if (timeOut) {
+      clearTimeout(timeOut as number);
     }
+    timeOut = setTimeout(() => {
+      if (item.keyPath) {
+        onChartFieldChange(value, item.keyPath);
+      } else {
+        onFieldChange(type, item.name, value);
+      }
+    }, 300);
   };
 
   const generateFieldList = (
@@ -137,7 +143,7 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
     }[] = [];
     for (const key in fConfigs) {
       const listItem = {
-        key,
+        key: key + '-' + config!.key,
         label: fConfigs[key as FieldCategory]!.title,
         children: (
           <div>

@@ -4,18 +4,28 @@ import './drop-board.less';
 interface DropBoardProps {
   children: React.ReactNode;
   onDrop?: (offset: { x: number; y: number }, item: unknown) => void;
+  onLeave?: () => void;
   dragging?: (offset: { x: number; y: number }, item: unknown) => void;
   onSelect?: () => void;
 }
 
-const DropBoard = ({ children, onDrop, dragging, onSelect }: DropBoardProps) => {
+const DropBoard = ({
+  children,
+  onDrop,
+  onLeave,
+  dragging,
+  onSelect,
+}: DropBoardProps) => {
   const [states, dropRef] = useDrop(() => {
     return {
       accept: ['item', 'chart'],
       canDrop: (item, monitor) => {
         if (monitor.isOver()) {
           dragging?.(monitor.getClientOffset()!, item);
+        } else {
+          onLeave?.();
         }
+        console.log(monitor.isOver(), 'over');
         return true;
       },
       drop: (item, monitor) => {

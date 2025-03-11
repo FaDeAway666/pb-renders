@@ -72,13 +72,13 @@ const formatChartOptionFields = (options: Record<string, any>) => {
           ...map[mapKey],
           props: {
             ...map[mapKey].props,
-            value,
+            // value,
             defaultValue: value,
           },
         };
-        if (map[mapKey].fieldType === FieldType.INPUT) {
-          delete newField.props.value;
-        }
+        // if (map[mapKey].fieldType === FieldType.INPUT) {
+        //   delete newField.props.value;
+        // }
         fieldConfigs[key as ChartOptionCategory]?.children.push(newField);
       }
     }

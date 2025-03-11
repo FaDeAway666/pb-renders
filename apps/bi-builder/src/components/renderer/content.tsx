@@ -18,6 +18,7 @@ import { deepClone } from '@/utils/json';
 
 import ChartPanel from '../chart/panel';
 import './content.less';
+import type { OptionsConfig } from '../options/options';
 import OptionsWrapper from '../options/options';
 
 const LayoutContent = () => {
@@ -171,6 +172,10 @@ const LayoutContent = () => {
     // setDragItem((item as any).key);
   };
 
+  const onLeave = () => {
+    setIsDragging(false);
+  };
+
   const getChartWidth = () => {
     let padWidth = 0;
     const { padding, colNum = 3, colGutter = 20 } = config;
@@ -269,6 +274,7 @@ const LayoutContent = () => {
         <DropBoard
           onDrop={onDrop}
           dragging={dragging}
+          onLeave={onLeave}
           onSelect={() => {
             setSelectedId('page');
           }}
@@ -308,7 +314,7 @@ const LayoutContent = () => {
           </GridRenderer>
         </DropBoard>
       </div>
-      <OptionsWrapper config={currentItem} />
+      <OptionsWrapper config={currentItem as OptionsConfig} />
     </div>
   );
 };
