@@ -53,15 +53,67 @@ importers:
       '@ant-design/icons':
         specifier: ^5.5.2
         version: 5.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      'pb-bi-render':
-        specifier: workspace:^
-        version: link:../../packages/bi-render
       '@pb-renders/utils':
         specifier: workspace:^
         version: link:../../packages/utils
       antd:
         specifier: ^5.22.6
         version: 5.22.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      pb-bi-render:
+        specifier: workspace:^
+        version: link:../../packages/bi-render
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dnd:
+        specifier: ^16.0.1
+        version: 16.0.1(@types/node@22.10.2)(@types/react@18.3.18)(react@18.3.1)
+      react-dnd-html5-backend:
+        specifier: ^16.0.1
+        version: 16.0.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      uuid:
+        specifier: ^11.0.3
+        version: 11.0.3
+      zustand:
+        specifier: ^5.0.2
+        version: 5.0.2(@types/react@18.3.18)(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.17
+        version: 18.3.18
+      '@types/react-dom':
+        specifier: ^18.3.5
+        version: 18.3.5(@types/react@18.3.18)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.3.4(vite@5.4.11(@types/node@22.10.2)(less@4.2.1))
+      globals:
+        specifier: ^15.13.0
+        version: 15.14.0
+      less:
+        specifier: ^4.2.1
+        version: 4.2.1
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.11(@types/node@22.10.2)(less@4.2.1)
+
+  apps/form-builder:
+    dependencies:
+      '@ant-design/icons':
+        specifier: ^5.5.2
+        version: 5.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@pb-renders/utils':
+        specifier: workspace:^
+        version: link:../../packages/utils
+      antd:
+        specifier: ^5.22.6
+        version: 5.22.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      pb-bi-render:
+        specifier: workspace:^
+        version: link:../../packages/bi-render
       react:
         specifier: ^18.3.1
         version: 18.3.1
