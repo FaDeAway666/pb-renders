@@ -1,5 +1,5 @@
 import { Button, message, Modal, Space } from 'antd';
-import { Renderer } from 'pb-bi-render';
+// import { Renderer } from 'pb-bi-render';
 import { useState } from 'react';
 
 import { useRendererStore } from '@/store';
@@ -75,12 +75,12 @@ export const HeaderContent = () => {
         footer={null}
         onCancel={() => setVisible(false)}
       >
-        <Renderer
+        {/* <Renderer
           mode="grid"
           config={getConfig()}
           data={dataFetch}
           dataLabelMap={dataLabelMap}
-        />
+        /> */}
       </Modal>
     </>
   );

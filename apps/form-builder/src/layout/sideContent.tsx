@@ -10,16 +10,12 @@ const ChartDragItem = ({ children }: ChartDragItemProps) => {
 
 const data = [
   {
-    id: 'bar',
-    type: 'chart',
+    id: 'container',
+    type: 'container',
   },
   {
-    id: 'line',
-    type: 'chart',
-  },
-  {
-    id: 'custom1',
-    type: 'custom',
+    id: 'input',
+    type: 'formItem',
   },
 ];
 

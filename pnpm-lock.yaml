@@ -111,9 +111,9 @@ importers:
       antd:
         specifier: ^5.22.6
         version: 5.22.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      pb-bi-render:
+      pb-form-render:
         specifier: workspace:^
-        version: link:../../packages/bi-render
+        version: link:../../packages/form-render
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -173,6 +173,37 @@ importers:
       '@pb-renders/config-tsup':
         specifier: workspace:^
         version: link:../../tools/tsup
+      '@types/react':
+        specifier: ^18.0.28
+        version: 18.3.18
+
+  packages/form-render:
+    dependencies:
+      '@ant-design/icons':
+        specifier: ^5.5.2
+        version: 5.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      antd:
+        specifier: ^5.0.0
+        version: 5.22.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.0.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@pb-renders/config-tsconfig':
+        specifier: workspace:^
+        version: link:../../tools/tsconfig
+      '@pb-renders/config-tsup':
+        specifier: workspace:^
+        version: link:../../tools/tsup
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/react':
         specifier: ^18.0.28
         version: 18.3.18
@@ -1423,6 +1454,12 @@ packages:
 
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+
+  '@types/lodash-es@4.17.12':
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+
+  '@types/lodash@4.17.20':
+    resolution: {integrity: sha512-H3MHACvFUEiujabxhaI/ImO6gUrd8oOurg7LQtS7mbwIXA/cUqWrvBsaeJ23aZEPk1TAYkurjfMbSELfoCXlGA==}
 
   '@types/minimist@1.2.5':
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
@@ -3072,6 +3109,9 @@ packages:
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
+
+  lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
 
   lodash.camelcase@4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
@@ -5749,6 +5789,12 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
+  '@types/lodash-es@4.17.12':
+    dependencies:
+      '@types/lodash': 4.17.20
+
+  '@types/lodash@4.17.20': {}
+
   '@types/minimist@1.2.5': {}
 
   '@types/node@20.5.1': {}
@@ -7844,6 +7890,8 @@ snapshots:
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
+
+  lodash-es@4.17.21: {}
 
   lodash.camelcase@4.3.0: {}
 
