@@ -2,20 +2,22 @@ import type { FormInstance } from 'antd';
 import { Row, Form, Input, Select, Switch, DatePicker, Col } from 'antd';
 import { cloneElement, memo, useEffect, useState } from 'react';
 
-import { useHidden } from '@/hooks/useHidden';
+import { useBus } from '@/hooks/useBus';
 import type { CustomSchema, RowSchema, FormItemSchema, FormListSchema } from '@/types';
 import { FieldCategory } from '@/types';
 import EventBus from '@/utils/event-bus';
+
+import { FormList, MemoFormList } from './form-list';
 
 interface FormItemProps {
   schema: FormItemSchema | RowSchema | CustomSchema | FormListSchema;
   form: FormInstance;
 }
 
-export const renderFieldItem = (
-  data: FormItemSchema['properties'],
-): React.ReactElement => {
-  console.log('field render');
+export const renderFieldItem = (data: {
+  category: FieldCategory;
+  props: Record<string, any>;
+}): React.ReactElement => {
   switch (data.category) {
     case FieldCategory.INPUT:
       return <Input {...data.props} />;
@@ -61,9 +63,12 @@ export const renderRowItem = (data: RowSchema, form: FormInstance) => {
   );
 };
 
-export const renderCustomItem = (data: CustomSchema, form: FormInstance) => {
-  const { component, properties } = data;
-  return component(properties, form);
+export const renderCustomItem = (schema: CustomSchema, form: FormInstance) => {
+  const { component, properties } = schema;
+  return component({
+    properties,
+    form,
+  });
 };
 
 export const FormItem = (props: {
@@ -72,8 +77,9 @@ export const FormItem = (props: {
   form?: FormInstance;
 }) => {
   const { data, form, children } = props;
-  const hidden = useHidden(data.hidden);
-  const disabled = useHidden(data.disabled);
+  const hidden = useBus(data.hidden, data.name, 'hidden');
+  const disabled = useBus(data.disabled, data.name, 'disabled');
+  const readOnly = useBus(data.readOnly, data.name, 'readOnly');
   // const [hidden, setHidden] = useState(typeof data.hidden === 'function' ? data.hidden );
   const enhancedChild = cloneElement(children, {
     onChange: (event: any) => {
@@ -92,6 +98,7 @@ export const FormItem = (props: {
       }
     },
     disabled,
+    readOnly,
   });
 
   return !hidden ? (
@@ -108,7 +115,7 @@ export const FormItem = (props: {
   );
 };
 
-const MemoFieldItem = memo(
+export const MemoFieldItem = memo(
   ({ schema, form }: { schema: FormItemSchema; form: FormInstance }) => {
     console.log('MemoFormItem render', schema);
     return (
@@ -138,6 +145,8 @@ export const renderFormItem = (props: FormItemProps) => {
           {renderCustomItem(schema, form)}
         </FormItem>
       );
+    case 'formList':
+      return <MemoFormList key={schema.properties.name} form={form} schema={schema} />;
     default:
       return <></>;
   }

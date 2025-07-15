@@ -32,10 +32,14 @@ class EventBus {
   }
 
   // 取消订阅事件
-  public unsubscribe(target: string): void {
+  public unsubscribe(target: string, callback?: (...args: any[]) => void): void {
     const callbacks = this.events.get(target);
     if (callbacks) {
-      this.events.delete(target);
+      if (!callback) {
+        this.events.delete(target);
+        return;
+      }
+      callbacks.delete(callback);
     }
   }
 
@@ -46,6 +50,12 @@ class EventBus {
       for (const callback of callbacks) {
         callback(...args);
       }
+    }
+  }
+
+  public unsubscribeAll() {
+    for (const key in this.events) {
+      this.events.delete(key);
     }
   }
 }

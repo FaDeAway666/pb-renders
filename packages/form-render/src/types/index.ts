@@ -1,4 +1,5 @@
-import type { FormInstance, FormItemProps, RowProps } from 'antd';
+import type { FormInstance, FormItemProps, FormListFieldData, RowProps } from 'antd';
+import type { FormListOperation, Rule } from 'antd/es/form';
 
 export enum SchemaType {
   FORM_ITEM = 'formItem',
@@ -33,8 +34,9 @@ export interface FormItemSchema {
     itemProps: FormItemProps;
     disabled?: boolean | WatchHook;
     hidden?: boolean | WatchHook;
-    depends?: WatchHook;
+    readOnly?: boolean | WatchHook;
   };
+  depends?: WatchHook;
 }
 
 export interface RowSchema {
@@ -43,17 +45,37 @@ export interface RowSchema {
   children: FormItemSchema[];
 }
 
+export interface FormListItemSchema {
+  type: 'normal' | 'custom';
+  properties: {
+    category?: FieldCategory;
+    name?: string;
+    label?: string;
+    props?: Record<string, any>;
+    itemProps?: FormItemProps;
+  };
+  customComponent?: (field: FormListFieldData) => React.ReactElement;
+  children?: FormListItemSchema[];
+}
+
 export interface FormListSchema {
   type: SchemaType.FORM_LIST;
   properties: {
     name: string;
+    label?: string;
+    initialValue?: any[];
+    rules?: any[];
   };
+  children: FormListItemSchema[];
+  addonNode?: (add: FormListOperation['add']) => React.ReactNode;
+  removeNode?: (remove: FormListOperation['remove'], index: number) => React.ReactNode;
 }
 
 export interface CustomSchema {
   type: SchemaType.CUSTOM;
-  component: (...args: any[]) => JSX.Element;
+  component: (...args: any[]) => React.ReactElement;
   properties: Omit<FormItemSchema['properties'], 'category'>;
+  depends?: WatchHook;
 }
 
-export type Schema = FormItemSchema | RowSchema | FormListSchema | CustomSchema;
+export type Schema = FormItemSchema | RowSchema | CustomSchema | FormListSchema;
