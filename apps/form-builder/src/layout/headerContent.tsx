@@ -6,15 +6,8 @@ import { useRendererStore } from '@/store';
 import './headerContent.less';
 import { deepToString } from '@/utils/json';
 
-const testFetch = () =>
-  new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(1);
-    }, 2000);
-  });
-
 export const HeaderContent = () => {
-  const getConfig = useRendererStore((state) => state.getConfig);
+  const getConfig = useRendererStore((state) => state.getSchemas);
   const [visible, setVisible] = useState(false);
 
   const exportConfig = () => {
@@ -28,32 +21,6 @@ export const HeaderContent = () => {
     });
   };
 
-  const dataFetch = {
-    bar: () => {
-      return testFetch().then(() => ({
-        sales: {
-          tshirt: 10,
-          hoodie: 20,
-          sweather: 40,
-          skirt: 30,
-        },
-        imports: {
-          tshirt: 20,
-          hoodie: 30,
-          sweather: 50,
-          skirt: 30,
-        },
-      }));
-    },
-  };
-
-  const dataLabelMap = {
-    tshirt: 'T恤',
-    hoodie: '卫衣',
-    sweather: '毛衣',
-    skirt: '裙子',
-    sales: '销量',
-  };
   return (
     <>
       <div className="header-container">

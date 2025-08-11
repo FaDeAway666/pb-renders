@@ -1,27 +1,10 @@
-import type { RenderConfig } from 'pb-bi-render';
-
-import type { OptionsConfig } from '../options/options';
+import type { Schema } from 'pb-form-render';
+import type { FormItemSchema } from 'pb-form-render/dist/typing/types';
 
 import type { ChartOptionCategory } from './chartMap';
 import { ChartOptionCategoryLabel, ChartOptionMap } from './chartMap';
 import type { FieldCategory } from './constant';
 import { FieldMap, CategoryName, FieldType } from './constant';
-
-const getFuncPropsResult = (
-  name: string,
-  propFunc: (...args: any[]) => Record<string, any>,
-  renderConfig: RenderConfig,
-) => {
-  switch (name) {
-    case 'col':
-    case 'colSpan':
-      return {
-        ...propFunc(renderConfig.colNum),
-      };
-    default:
-      return {};
-  }
-};
 
 const getValueByPath = (options: Record<string, any>, path: string): any => {
   return path.split('/').reduce((acc, curr) => acc && acc[curr], options);
@@ -87,8 +70,8 @@ const formatChartOptionFields = (options: Record<string, any>) => {
   return fieldConfigs;
 };
 
-export const formatFields = (config: OptionsConfig, renderConfig: RenderConfig) => {
-  let fieldConfigs: Partial<
+export const formatFields = (schema: Schema) => {
+  const fieldConfigs: Partial<
     Record<
       FieldCategory,
       {
@@ -98,7 +81,7 @@ export const formatFields = (config: OptionsConfig, renderConfig: RenderConfig) 
     >
   > = {};
 
-  for (const key in config) {
+  for (const key in schema.properties) {
     if (FieldMap[key]) {
       const category = FieldMap[key].category;
 
@@ -106,14 +89,9 @@ export const formatFields = (config: OptionsConfig, renderConfig: RenderConfig) 
         name: key,
         ...FieldMap[key],
         props: {
-          ...(FieldMap[key].props instanceof Function
-            ? getFuncPropsResult(
-                key,
-                FieldMap[key].props as (...args: any[]) => Record<string, any>,
-                renderConfig,
-              )
-            : FieldMap[key].props),
-          value: (config as Record<string, any>)[key],
+          ...FieldMap[key].props,
+          // value: (schema.properties as Record<string, any>)[key],
+          defaultValue: (schema.properties as Record<string, any>)[key],
         },
       };
       if (!fieldConfigs[category]) {
@@ -125,12 +103,27 @@ export const formatFields = (config: OptionsConfig, renderConfig: RenderConfig) 
         fieldConfigs[category].children.push(newField);
       }
     }
-    if (key === 'chartOptions' && config[key]) {
-      const chartFields = formatChartOptionFields(config[key]);
-      fieldConfigs = {
-        ...fieldConfigs,
-        ...chartFields,
+  }
+
+  for (const key in (schema as FormItemSchema).properties.props) {
+    if (FieldMap[key]) {
+      const category = FieldMap[key].category;
+
+      const newField = {
+        name: key,
+        ...FieldMap[key],
+        props: {
+          ...FieldMap[key].props,
+          // value: ((schema as FormItemSchema).properties.props as Record<string, any>)[
+          //   key
+          // ],
+          defaultValue: (
+            (schema as FormItemSchema).properties.props as Record<string, any>
+          )[key],
+        },
       };
+
+      fieldConfigs[category]!.children.push(newField);
     }
   }
 

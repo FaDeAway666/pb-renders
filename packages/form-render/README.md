@@ -15,7 +15,7 @@
 props：
 
 - formConfig: 基于 antd FormProps
-- schemas：配置项
+- schema：配置项
 
 ```ts
 const schemas = [

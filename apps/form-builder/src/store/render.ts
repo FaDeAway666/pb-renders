@@ -1,50 +1,49 @@
-import type { ItemConfig, RenderConfig } from 'pb-bi-render';
+import type { Schema } from 'pb-form-render';
 import { create } from 'zustand';
 
+export type RenderSchema = Schema & { id: string };
 interface RendererStore {
-  config: RenderConfig;
-  gridArray: (string | null)[][];
-  rowHeightArray: number[];
-  setRowHeightArray: (rowHeightArray: number[]) => void;
-  getRowHeightArray: () => number[];
-  setGridArray: (gridArray: (string | null)[][]) => void;
-  getGridArray: () => (string | null)[][];
-  getConfig: () => RenderConfig;
-  setPanelConfig: (config: Omit<RenderConfig, 'children'>) => void;
-  setChartsConfig: (charts: ItemConfig[]) => void;
+  schemas: RenderSchema[];
+  activeId: string;
+  detectingId: string;
+  isDragging: boolean;
+  setIsDragging: (isDragging: boolean) => void;
+  setDetectingId: (id: string) => void;
+  setActiveId: (id: string) => void;
+  setSchemas: (schemas: RenderSchema[]) => void;
+  getSchemas: () => RenderSchema[];
+  schemaIds: (string | { id: string; children: string[] })[];
+  setSchemaIds: (schemaIds: (string | { id: string; children: string[] })[]) => void;
+  getSchemaIds: () => (string | { id: string; children: string[] })[];
 }
 
 const useRendererStore = create<RendererStore>((set, get) => ({
-  config: {
-    colNum: 3,
-    padding: 20,
-    colGutter: 24,
-    rowGutter: 24,
-    background: '#fcfcfc',
-    children: [],
+  schemas: [],
+  activeId: '',
+  detectingId: '',
+  isDragging: false,
+  setIsDragging: (isDragging: boolean) => {
+    set(() => ({ isDragging }));
   },
-  getConfig: () => {
-    return get().config;
+  setActiveId: (id: string) => {
+    set(() => ({ activeId: id }));
   },
-  rowHeightArray: [],
-  getRowHeightArray: () => {
-    return get().rowHeightArray;
+  setDetectingId: (id: string) => {
+    set(() => ({ detectingId: id }));
   },
-  setRowHeightArray: (rowHeightArray: number[]) =>
-    set(() => ({ rowHeightArray: [...rowHeightArray] })),
-  gridArray: [],
-  setGridArray: (gridArray: (string | null)[][]) =>
-    set(() => {
-      console.log(gridArray, 'set gridarray');
-      return { gridArray: [...gridArray] };
-    }),
-  getGridArray: () => {
-    return get().gridArray;
+  getSchemas: () => {
+    return get().schemas;
   },
-  setPanelConfig: (config) =>
-    set((state) => ({ config: { ...config, children: state.config.children } })),
-  setChartsConfig: (charts: ItemConfig[]) =>
-    set((state) => ({ config: { ...state.config, children: charts } })),
+  setSchemas: (schemas: RenderSchema[]) => {
+    set(() => ({ schemas: [...schemas] }));
+  },
+  schemaIds: [],
+  getSchemaIds: () => {
+    return get().schemaIds;
+  },
+  setSchemaIds: (schemaIds: (string | { id: string; children: string[] })[]) => {
+    set(() => ({ schemaIds: [...schemaIds] }));
+  },
 }));
 
 export default useRendererStore;

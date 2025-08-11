@@ -1,9 +1,9 @@
 import { Input, Select, Radio, InputNumber, ColorPicker, Switch } from 'antd';
+import { AggregationColor } from 'antd/es/color-picker/color';
 
 import { FieldType } from './constant';
 
 import './field.less';
-import { AggregationColor } from 'antd/es/color-picker/color';
 
 export const getFormItem = (
   type: FieldType,

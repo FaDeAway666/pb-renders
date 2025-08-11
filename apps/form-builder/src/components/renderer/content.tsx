@@ -1,28 +1,21 @@
-import { FormRender, SchemaType, FieldCategory } from 'pb-form-render';
+import { SortableContext } from '@dnd-kit/sortable';
+import type { FormInstance } from 'antd';
+import { Form, Input, Select, Space } from 'antd';
+import { FormRender, SchemaType, FieldCategory, renderFormItem } from 'pb-form-render';
 import type { Schema } from 'pb-form-render';
-import type { CustomSchema } from 'pb-form-render/dist/typing/types';
+import type { CustomSchema, RowSchema } from 'pb-form-render/dist/typing/types';
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { v4 as uuid } from 'uuid';
 
 import DropBoard from '@/components/dnd/dropBoard';
-import type { ChartType } from '@/constant/chart';
-import { defaultChartOptions } from '@/constant/chart';
 import { customOptions } from '@/constant/custom';
 import { useRendererStore } from '@/store';
-import {
-  getGridLayout,
-  initGridArray,
-  rearangeGrid,
-  rebuildGridArray,
-} from '@/utils/grid';
 import { deepClone } from '@/utils/json';
 
-import ChartPanel from '../chart/panel';
 import './content.less';
-import type { OptionsConfig } from '../options/options';
+import { DragTool, SortableItem, SortableRowItem } from '../dnd/drag-item';
 import OptionsWrapper from '../options/options';
-import type { FormInstance } from 'antd';
-import { Form, Input, Select, Space } from 'antd';
 
 const TestCustom = (props: {
   properties: CustomSchema['properties'];
@@ -235,49 +228,109 @@ const testSchema: Schema[] = [
 
 const LayoutContent = () => {
   const [form] = Form.useForm();
-  const formRef = useRef<Record<string, any>>();
+  const {
+    schemaIds,
+    schemas,
+    isDragging,
+    activeId,
+    detectingId,
+    setActiveId,
+    setDetectingId,
+  } = useRendererStore();
 
-  useEffect(() => {
-    const formIns = formRef.current;
+  const handleMouseOver = (e: React.MouseEvent) => {
+    const path = e.nativeEvent.composedPath();
+    if (isDragging) return;
 
-    formIns?.updateSchemaByPath({
-      custom: {
-        props: {
-          options1: [
-            { label: '1', value: 1 },
-            { label: '2', value: 2 },
-          ],
-          options2: [
-            { label: '3', value: 3 },
-            { label: '4', value: 4 },
-          ],
-        },
-      },
-    });
-  }, []);
+    for (let i = 0; i < path.length; i++) {
+      const ele = path[i] as HTMLElement;
+      if (activeId === ele.dataset?.componentId) {
+        setDetectingId('');
+        return;
+      }
+      if (ele.dataset?.componentId) {
+        setDetectingId(ele.dataset.componentId);
+        return;
+      }
+    }
 
+    // e.stopPropagation();
+    // e.preventDefault();
+    // setDetectingId('');
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const path = e.nativeEvent.composedPath();
+
+    for (let i = 0; i < path.length; i++) {
+      const ele = path[i] as HTMLElement;
+      if (detectingId === ele.dataset?.componentId) {
+        setActiveId(detectingId);
+        return;
+      }
+    }
+  };
+
+  const DndMask = createPortal(<DragTool />, document.body);
+  const [text, setText] = useState('');
   return (
     <div className="content-container">
-      <Input
-        onChange={(val) => {
-          formRef.current?.updateSchemaByPath({
-            username: {
-              props: {
-                placeholder: val.target.value,
-              },
-            },
-          });
+      {/* <Input
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
         }}
-      />
-      {/* <FormRender
-        ref={formRef}
-        form={form}
-        initialValues={{ formlist: [], username: 'sdf' }}
-        schema={testSchema}
-        layout="vertical"
+        onCompositionEnd={() => {
+          console.log('compend');
+        }}
       /> */}
-      {/* <button onClick={() => console.log(form.getFieldsValue())}>submit</button> */}
+      <div
+        className="render-content"
+        onMouseOver={handleMouseOver}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={() => {
+          setDetectingId('');
+        }}
+      >
+        {!schemaIds.length ? (
+          <DropBoard></DropBoard>
+        ) : (
+          <Form style={{ height: '100%', position: 'relative' }} form={form}>
+            <SortableContext items={schemaIds}>
+              {schemaIds.map((id, index) => {
+                if (typeof id === 'object') {
+                  return (
+                    <SortableRowItem
+                      key={id.id}
+                      id={id.id}
+                      data={{ ...(schemas[index] as RowSchema), sortType: 'container' }}
+                      form={form}
+                    ></SortableRowItem>
+                  );
+                } else {
+                  return (
+                    <SortableItem
+                      key={id}
+                      id={id}
+                      data={{ ...schemas[index], sortType: 'item' }}
+                    >
+                      {renderFormItem({ schema: schemas[index], form })}
+                    </SortableItem>
+                  );
+                }
+              })}
+            </SortableContext>
+            {DndMask}
+          </Form>
+        )}
+      </div>
+      <OptionsWrapper />
     </div>
+    // <FormRender
+    //   initialValues={{ username: '123' }}
+    //   form={form}
+    //   schema={testSchema}
+    // ></FormRender>
   );
 };
 

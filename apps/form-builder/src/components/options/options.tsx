@@ -1,163 +1,107 @@
-import type { ItemConfig, RenderConfig } from 'pb-bi-render';
 import './options.less';
 import { Collapse } from 'antd';
+import { cloneDeep } from 'lodash-es';
+import { SchemaType } from 'pb-form-render';
+import type { Schema } from 'pb-form-render';
+import type { FormItemSchema, RowSchema } from 'pb-form-render/dist/typing/types';
+import { useEffect, useState } from 'react';
 
 import { useRendererStore } from '@/store';
-import { rearangeGrid } from '@/utils/grid';
+import type { RenderSchema } from '@/store/render';
+import { getPathById, getSchemaByIdPath, updateSchemas } from '@/utils/schema';
 
-import type { FieldCategory } from '../field/constant';
+import { FieldCategory } from '../field/constant';
 import { FieldItem } from '../field/fieldItem';
-import { formatFields, setValueByPath } from '../field/utils';
+import { formatFields } from '../field/utils';
+import { setValueByPath } from '../field/utils';
 
-export type OptionsConfig = ItemConfig & Omit<RenderConfig, 'children'>;
+type ItemType = {
+  key: string;
+  label: string;
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+};
 
-interface OptionsWrapperProps {
-  config?: OptionsConfig;
-}
+const specialProps = ['name', 'label', 'colNum'];
 
-const rearrangeKeys = ['row', 'col', 'rowSpan', 'colSpan'];
+const OptionsWrapper = () => {
+  const { activeId, schemas, getSchemas, getSchemaIds, setSchemas } =
+    useRendererStore();
+  const [fieldLists, setFieldLists] = useState<ItemType[]>();
 
-const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
-  const renderConfig = useRendererStore((state) => state.config);
-  const getGridArray = useRendererStore((state) => state.getGridArray);
-  const setGridArray = useRendererStore((state) => state.setGridArray);
-  const setPanelConfig = useRendererStore((state) => state.setPanelConfig);
-  const setCharts = useRendererStore((state) => state.setChartsConfig);
+  // let timeOut: unknown | null = null;
+  // const dispatchChange = (type: string, value: any, item: Record<string, any>) => {
+  //   if (timeOut) {
+  //     clearTimeout(timeOut as number);
+  //   }
+  //   timeOut = setTimeout(() => {
+  //     if (item.keyPath) {
+  //       onChartFieldChange(value, item.keyPath);
+  //     } else {
+  //       onFieldChange(type, item.name, value);
+  //     }
+  //   }, 300);
+  // };
+  const onFieldChange = (value: any, keyName: string, type: FieldCategory) => {
+    const schemaIds = getSchemaIds();
+    const cSchemas = getSchemas();
+    const idPath = getPathById(schemaIds, activeId);
+    const currSchema =
+      idPath.length > 1
+        ? (cSchemas[idPath[0]] as RowSchema).children[idPath[1]]
+        : cSchemas[idPath[0]];
 
-  const fieldConfigs = config ? formatFields(config, renderConfig) : {};
+    if (!currSchema) return;
 
-  const updateGridArray = (itemConfig: ItemConfig, state: Record<string, number>) => {
-    const charts = renderConfig.children;
-
-    if (!itemConfig) return;
-    // itemConfig.colSpan = 2;
-    // itemConfig.rowSpan = 2;
-
-    const gridArray = getGridArray();
-    const originPosition = {
-      row: itemConfig.row!,
-      col: itemConfig.col!,
-      rowSpan: itemConfig.rowSpan || 1,
-      colSpan: itemConfig.colSpan || 1,
-    };
-    const targetPosition = { ...originPosition, ...state };
-    console.log(originPosition, targetPosition, 'positions');
-    const { colSpan } = targetPosition;
-
-    if (targetPosition.col + colSpan - 1 > gridArray[0].length) {
-      targetPosition.col = gridArray[0].length - colSpan + 1;
-    }
-
-    const { gridArray: newGridArray, charts: newCharts } = rearangeGrid(
-      charts,
-      gridArray,
-      targetPosition,
-      itemConfig.key,
-      renderConfig.colNum || 3,
-      originPosition,
-    );
-    // const gridArray = updateGridArrayWithSpan(
-    //   config.children,
-    //   getGridArray(),
-    //   {
-    //     row: itemConfig.row!,
-    //     col: itemConfig.col!,
-    //     rowSpan: itemConfig.rowSpan || 1,
-    //     colSpan: itemConfig.colSpan || 1,
-    //   },
-    //   id,
-    //   { rowSpan: 2, colSpan: 2 },
-    // );
-    setGridArray(newGridArray);
-    setCharts(newCharts);
-
-    // const charts = updateItemConfig(config.children, gridArray);
-    // console.log('updated charts', charts);
-    // setCharts(charts);
-  };
-
-  const onFieldChange = (type: string, key: string, value: any) => {
-    console.log('onFieldChange', key, value);
-    if (type === 'page' || type === 'page-style') {
-      (renderConfig as Record<string, any>)[key] = value;
-      setPanelConfig(renderConfig);
-    } else {
-      const charts = renderConfig.children;
-      const index = charts.findIndex(
-        (chart) => chart.key === (config as ItemConfig).key,
-      );
-      if (index > -1) {
-        if (rearrangeKeys.includes(key)) {
-          updateGridArray(charts[index], { [key]: value });
-        } else {
-          charts[index] = {
-            ...charts[index],
-            [key]: value,
-          };
-          setCharts(charts);
-        }
-      }
-    }
-  };
-
-  const onChartFieldChange = (value: any, path: string) => {
-    const charts = renderConfig.children;
-    const index = charts.findIndex((chart) => chart.key === (config as ItemConfig).key);
-    if (index > -1) {
-      const newOptions = setValueByPath(value, path, charts[index].chartOptions!);
-      charts[index].chartOptions = { ...newOptions };
-      setCharts(charts);
-    }
-  };
-
-  let timeOut: unknown | null = null;
-  const dispatchChange = (type: string, value: any, item: Record<string, any>) => {
-    if (timeOut) {
-      clearTimeout(timeOut as number);
-    }
-    timeOut = setTimeout(() => {
-      if (item.keyPath) {
-        onChartFieldChange(value, item.keyPath);
+    const newSchema = cloneDeep(currSchema);
+    if (type === FieldCategory.PROPERTIES) {
+      if (specialProps.includes(keyName)) {
+        newSchema.properties[keyName as keyof Schema['properties']] = value;
       } else {
-        onFieldChange(type, item.name, value);
+        (newSchema as FormItemSchema).properties.props[keyName] = value;
       }
-    }, 300);
+    } else if (type === FieldCategory.RULES) {
+      //
+    } else if (type === FieldCategory.LAYOUT) {
+      //
+      newSchema.properties[keyName as keyof Schema['properties']] = value;
+    }
+
+    if (idPath.length > 1) {
+      (cSchemas[idPath[0]] as RowSchema).children.splice(
+        idPath[1],
+        1,
+        newSchema as FormItemSchema,
+      );
+    } else {
+      cSchemas.splice(idPath[0], 1, newSchema as RenderSchema);
+    }
+    setSchemas([...cSchemas]);
+    console.log(value, keyName, 'field change');
   };
 
   const generateFieldList = (
-    fConfigs: Partial<
-      Record<
-        FieldCategory,
-        {
-          title: string;
-          children: Record<string, any>[];
-        }
-      >
-    >,
+    fieldConfigs: ReturnType<typeof formatFields>,
+    id: string,
   ) => {
-    const list: {
-      key: string;
-      label: string;
-      children: React.ReactNode;
-      style?: React.CSSProperties;
-    }[] = [];
-    for (const key in fConfigs) {
+    const list: ItemType[] = [];
+    for (const key in fieldConfigs) {
       const listItem = {
-        key: key + '-' + config!.key,
-        label: fConfigs[key as FieldCategory]!.title,
+        key: key,
+        label: fieldConfigs[key as FieldCategory]?.title || '',
         children: (
           <div>
-            {fConfigs[key as FieldCategory]!.children.map((child) => (
+            {fieldConfigs[key as FieldCategory]!.children.map((child) => (
               <FieldItem
-                key={child.name || child.keyPath}
+                key={id + '-' + child.name}
                 fieldConfig={{
                   type: child.fieldType,
-                  props:
-                    child.props instanceof Function
-                      ? child.props(renderConfig.colNum)
-                      : child.props,
+                  props: child.props,
                 }}
-                onChange={(value) => dispatchChange(key, value, child)}
+                onChange={(value) => {
+                  console.log(value, 'field change');
+                  onFieldChange(value, child.name, key as FieldCategory);
+                }}
               />
             ))}
           </div>
@@ -173,12 +117,24 @@ const OptionsWrapper = ({ config }: OptionsWrapperProps) => {
     return list;
   };
 
-  const configList = generateFieldList(fieldConfigs);
-  console.log(config, configList, fieldConfigs, 'configlist');
+  useEffect(() => {
+    const idPath = getPathById(getSchemaIds(), activeId);
+    const cSchema = getSchemaByIdPath(schemas, idPath);
+    console.log(cSchema, activeId, 'cshema');
+    if (cSchema) {
+      const fieldList = formatFields(cSchema);
+      console.log(fieldList, 'fieldlist');
+      setFieldLists(generateFieldList(fieldList, activeId));
+    } else {
+      setFieldLists([]);
+    }
+  }, [activeId, schemas]);
+
+  // const configList = generateFieldList(fieldConfigs);
 
   return (
     <div className="options-wrapper">
-      <Collapse items={configList} bordered={false} />
+      <Collapse items={fieldLists} bordered={false} />
     </div>
   );
 };

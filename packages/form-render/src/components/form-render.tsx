@@ -30,7 +30,12 @@ const initEvents = (schemas: Schema[]) => {
   console.log(bus.getEvents(), 'initEvents');
 };
 
-export const FormRender = forwardRef((props: FormBuilderProps, ref) => {
+export interface FormRenderRef {
+  updateSchemaByPath: (config: Record<string, Record<string, any>>) => void;
+  getSchema: () => Schema[];
+}
+
+export const FormRender = forwardRef<FormRenderRef, FormBuilderProps>((props, ref) => {
   const { schema, form, ...rest } = props;
   // 用于更新表单项
   const [schemaState, setSchemaState] = useState<Schema[]>(schema);

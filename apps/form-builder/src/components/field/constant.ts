@@ -1,13 +1,13 @@
 export enum FieldCategory {
-  PAGE = 'page',
+  PROPERTIES = 'properties',
   LAYOUT = 'layout',
-  PAGE_STYLE = 'page-style',
+  RULES = 'rules',
 }
 
 export const CategoryName = {
-  [FieldCategory.PAGE]: '页面',
+  [FieldCategory.PROPERTIES]: '属性',
   [FieldCategory.LAYOUT]: '布局',
-  [FieldCategory.PAGE_STYLE]: '样式',
+  [FieldCategory.RULES]: '校验',
 };
 
 export enum FieldType {
@@ -31,7 +31,7 @@ export const FieldMap: Record<
   }
 > = {
   colNum: {
-    category: FieldCategory.PAGE,
+    category: FieldCategory.LAYOUT,
     fieldType: FieldType.RADIO_GROUP,
     props: {
       defaultValue: 3,
@@ -45,7 +45,7 @@ export const FieldMap: Record<
     },
   },
   colGutter: {
-    category: FieldCategory.PAGE,
+    category: FieldCategory.LAYOUT,
     fieldType: FieldType.INPUT_NUMBER,
     props: {
       label: '列间距',
@@ -53,89 +53,25 @@ export const FieldMap: Record<
       step: 5,
     },
   },
-  rowGutter: {
-    category: FieldCategory.PAGE,
-    fieldType: FieldType.INPUT_NUMBER,
+  name: {
+    category: FieldCategory.PROPERTIES,
+    fieldType: FieldType.INPUT,
     props: {
-      label: '行间距',
-      min: 10,
-      step: 5,
+      label: '字段名',
     },
   },
-  padding: {
-    category: FieldCategory.PAGE_STYLE,
-    fieldType: FieldType.INPUT_NUMBER,
+  placeholder: {
+    category: FieldCategory.PROPERTIES,
+    fieldType: FieldType.INPUT,
     props: {
-      label: '页边距',
-      min: 10,
-      step: 5,
+      label: '占位符',
     },
   },
-  background: {
-    category: FieldCategory.PAGE_STYLE,
-    fieldType: FieldType.COLOR,
+  label: {
+    category: FieldCategory.PROPERTIES,
+    fieldType: FieldType.INPUT,
     props: {
-      label: '背景色',
-    },
-  },
-  col: {
-    category: FieldCategory.LAYOUT,
-    fieldType: FieldType.RADIO_GROUP,
-    props: (max: number) => {
-      const options = Array(max)
-        .fill(0)
-        .map((_, index) => ({
-          label: `${index + 1}`,
-          value: index + 1,
-        }));
-      return {
-        label: '列号',
-        options,
-      };
-    },
-  },
-  row: {
-    category: FieldCategory.LAYOUT,
-    fieldType: FieldType.INPUT_NUMBER,
-    props: {
-      label: '行号',
-      min: 1,
-      step: 1,
-    },
-  },
-  colSpan: {
-    category: FieldCategory.LAYOUT,
-    fieldType: FieldType.INPUT_NUMBER,
-    props: (max: number) => ({
-      label: '列数',
-      min: 1,
-      max,
-      step: 1,
-    }),
-  },
-  rowSpan: {
-    category: FieldCategory.LAYOUT,
-    fieldType: FieldType.INPUT_NUMBER,
-    props: {
-      label: '行数',
-      min: 1,
-      step: 1,
-    },
-  },
-  height: {
-    category: FieldCategory.LAYOUT,
-    fieldType: FieldType.INPUT_NUMBER,
-    props: {
-      label: '高度',
-      min: 10,
-      step: 10,
-    },
-  },
-  itemBackground: {
-    category: FieldCategory.LAYOUT,
-    fieldType: FieldType.COLOR,
-    props: {
-      label: '背景色',
+      label: '标签',
     },
   },
 };

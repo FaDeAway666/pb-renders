@@ -92,7 +92,7 @@ export const FormItem = (props: {
 
       // 判断当前FormItem是否需要派发更新
       const bus = EventBus.getInstance();
-      console.log(data.name, bus);
+
       if (bus.getEvents().get(data.name)) {
         bus.publish(data.name, value, form);
       }
@@ -117,7 +117,6 @@ export const FormItem = (props: {
 
 export const MemoFieldItem = memo(
   ({ schema, form }: { schema: FormItemSchema; form: FormInstance }) => {
-    console.log('MemoFormItem render', schema);
     return (
       <FormItem key={schema.properties.name} data={schema.properties} form={form}>
         {renderFieldItem(schema.properties)}
@@ -125,6 +124,10 @@ export const MemoFieldItem = memo(
     );
   },
   (prev, next) => {
+    console.log(
+      JSON.stringify(prev.schema.properties) === JSON.stringify(next.schema.properties),
+      'memo change',
+    );
     return (
       JSON.stringify(prev.schema.properties) === JSON.stringify(next.schema.properties)
     );
