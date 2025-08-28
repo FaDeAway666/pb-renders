@@ -27,11 +27,10 @@ const initEvents = (schemas: Schema[]) => {
       initEvents((schema as RowSchema).children);
     }
   }
-  console.log(bus.getEvents(), 'initEvents');
 };
 
 export interface FormRenderRef {
-  updateSchemaByPath: (config: Record<string, Record<string, any>>) => void;
+  updateSchemaByPath: (config: Record<string, unknown>) => void;
   getSchema: () => Schema[];
 }
 
@@ -46,9 +45,9 @@ export const FormRender = forwardRef<FormRenderRef, FormBuilderProps>((props, re
     callbacks.current = fns;
   };
 
-  const updateSchemaByPath = (newSchemaConfig: Record<string, Record<string, any>>) => {
+  const updateSchemaByPath = (newSchemaConfig: Record<string, unknown>) => {
     const newSchema = updateSchema(stateRef.current, newSchemaConfig);
-    console.log(schema, 'updateschema');
+    console.log(schema, newSchema, 'updateschema');
     setSchemaState(newSchema);
     stateRef.current = newSchema;
   };

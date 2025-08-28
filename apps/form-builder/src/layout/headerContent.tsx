@@ -1,5 +1,5 @@
-import { Button, message, Modal, Space } from 'antd';
-// import { Renderer } from 'pb-bi-render';
+import { Button, Form, message, Modal, Space } from 'antd';
+import { FormRender } from 'pb-form-render';
 import { useState } from 'react';
 
 import { useRendererStore } from '@/store';
@@ -9,6 +9,7 @@ import { deepToString } from '@/utils/json';
 export const HeaderContent = () => {
   const getConfig = useRendererStore((state) => state.getSchemas);
   const [visible, setVisible] = useState(false);
+  const [form] = Form.useForm();
 
   const exportConfig = () => {
     const curConfig = getConfig();
@@ -35,12 +36,20 @@ export const HeaderContent = () => {
       </div>
       <Modal
         wrapClassName="preview-wrapper"
-        width={'100vw'}
+        width={800}
         height={'1000'}
         title="预览"
+        destroyOnClose
         open={visible}
-        footer={null}
-        onCancel={() => setVisible(false)}
+        onCancel={() => {
+          form.resetFields();
+          setVisible(false);
+        }}
+        onOk={() => {
+          form.validateFields().then((values) => {
+            console.log(values, 'validate values');
+          });
+        }}
       >
         {/* <Renderer
           mode="grid"
@@ -48,6 +57,7 @@ export const HeaderContent = () => {
           data={dataFetch}
           dataLabelMap={dataLabelMap}
         /> */}
+        <FormRender form={form} schema={getConfig()}></FormRender>
       </Modal>
     </>
   );

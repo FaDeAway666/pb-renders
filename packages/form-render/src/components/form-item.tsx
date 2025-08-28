@@ -124,10 +124,6 @@ export const MemoFieldItem = memo(
     );
   },
   (prev, next) => {
-    console.log(
-      JSON.stringify(prev.schema.properties) === JSON.stringify(next.schema.properties),
-      'memo change',
-    );
     return (
       JSON.stringify(prev.schema.properties) === JSON.stringify(next.schema.properties)
     );

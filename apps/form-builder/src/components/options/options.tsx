@@ -1,5 +1,5 @@
 import './options.less';
-import { Collapse } from 'antd';
+import { Collapse, Tabs } from 'antd';
 import { cloneDeep } from 'lodash-es';
 import { SchemaType } from 'pb-form-render';
 import type { Schema } from 'pb-form-render';
@@ -23,6 +23,13 @@ type ItemType = {
 };
 
 const specialProps = ['name', 'label', 'colNum'];
+
+function stringToRegex(s: string) {
+  // 支持 "/abc/i" 或 "abc" 两种输入
+  const m = s.match(/^\/(.+)\/([gimsuy]*)$/);
+  if (m) return new RegExp(m[1], m[2]);
+  return new RegExp(s);
+}
 
 const OptionsWrapper = () => {
   const { activeId, schemas, getSchemas, getSchemaIds, setSchemas } =
@@ -61,6 +68,16 @@ const OptionsWrapper = () => {
         (newSchema as FormItemSchema).properties.props[keyName] = value;
       }
     } else if (type === FieldCategory.RULES) {
+      const formatValue = value.map((v: any) => {
+        if (v.pattern) {
+          v.pattern = stringToRegex(v.pattern);
+        }
+        return v;
+      });
+
+      (newSchema as FormItemSchema).properties.itemProps[
+        keyName as keyof FormItemSchema['properties']['itemProps']
+      ] = formatValue;
       //
     } else if (type === FieldCategory.LAYOUT) {
       //
@@ -90,7 +107,7 @@ const OptionsWrapper = () => {
         key: key,
         label: fieldConfigs[key as FieldCategory]?.title || '',
         children: (
-          <div>
+          <div style={{ padding: '0 16px' }}>
             {fieldConfigs[key as FieldCategory]!.children.map((child) => (
               <FieldItem
                 key={id + '-' + child.name}
@@ -106,10 +123,6 @@ const OptionsWrapper = () => {
             ))}
           </div>
         ),
-        style: {
-          border: 'none',
-          borderRadius: '5px',
-        },
       };
       list.push(listItem);
     }
@@ -134,7 +147,8 @@ const OptionsWrapper = () => {
 
   return (
     <div className="options-wrapper">
-      <Collapse items={fieldLists} bordered={false} />
+      <Tabs type="card" items={fieldLists}></Tabs>
+      {/* <Collapse items={fieldLists} bordered={false} /> */}
     </div>
   );
 };

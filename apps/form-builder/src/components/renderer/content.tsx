@@ -2,16 +2,13 @@ import { SortableContext } from '@dnd-kit/sortable';
 import type { FormInstance } from 'antd';
 import { Form, Input, Select, Space } from 'antd';
 import { FormRender, SchemaType, FieldCategory, renderFormItem } from 'pb-form-render';
-import type { Schema } from 'pb-form-render';
+import type { FormRenderRef, Schema } from 'pb-form-render';
 import type { CustomSchema, RowSchema } from 'pb-form-render/dist/typing/types';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { v4 as uuid } from 'uuid';
 
 import DropBoard from '@/components/dnd/dropBoard';
-import { customOptions } from '@/constant/custom';
 import { useRendererStore } from '@/store';
-import { deepClone } from '@/utils/json';
 
 import './content.less';
 import { DragTool, SortableItem, SortableRowItem } from '../dnd/drag-item';
@@ -109,6 +106,16 @@ const testSchema: Schema[] = [
       itemProps: {
         initialValue: true,
       },
+    },
+  },
+  {
+    type: SchemaType.FORM_ITEM,
+    properties: {
+      label: '选择',
+      category: FieldCategory.SELECT,
+      name: 'select',
+      props: {},
+      itemProps: {},
     },
   },
   {
@@ -228,6 +235,7 @@ const testSchema: Schema[] = [
 
 const LayoutContent = () => {
   const [form] = Form.useForm();
+  const formRef = useRef<FormRenderRef>(null);
   const {
     schemaIds,
     schemas,
@@ -272,18 +280,9 @@ const LayoutContent = () => {
   };
 
   const DndMask = createPortal(<DragTool />, document.body);
-  const [text, setText] = useState('');
+
   return (
     <div className="content-container">
-      {/* <Input
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-        }}
-        onCompositionEnd={() => {
-          console.log('compend');
-        }}
-      /> */}
       <div
         className="render-content"
         onMouseOver={handleMouseOver}
@@ -327,6 +326,7 @@ const LayoutContent = () => {
       <OptionsWrapper />
     </div>
     // <FormRender
+    //   ref={formRef}
     //   initialValues={{ username: '123' }}
     //   form={form}
     //   schema={testSchema}

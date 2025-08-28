@@ -127,5 +127,34 @@ export const formatFields = (schema: Schema) => {
     }
   }
 
+  for (const key in (schema as FormItemSchema).properties.itemProps) {
+    if (FieldMap[key]) {
+      const category = FieldMap[key].category;
+
+      const newField = {
+        name: key,
+        ...FieldMap[key],
+        props: {
+          ...FieldMap[key].props,
+          // value: ((schema as FormItemSchema).properties.props as Record<string, any>)[
+          //   key
+          // ],
+          defaultValue: (
+            (schema as FormItemSchema).properties.itemProps as Record<string, any>
+          )[key],
+        },
+      };
+
+      if (!fieldConfigs[category]) {
+        fieldConfigs[category] = {
+          title: CategoryName[category],
+          children: [newField],
+        };
+      } else {
+        fieldConfigs[category].children.push(newField);
+      }
+    }
+  }
+
   return fieldConfigs;
 };

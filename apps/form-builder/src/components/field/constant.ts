@@ -20,6 +20,7 @@ export enum FieldType {
   RADIO_GROUP = 'radio-group',
   COLOR = 'color',
   SWITCH = 'switch',
+  RULE_LIST = 'rule-list',
 }
 
 export const FieldMap: Record<
@@ -72,6 +73,13 @@ export const FieldMap: Record<
     fieldType: FieldType.INPUT,
     props: {
       label: '标签',
+    },
+  },
+  rules: {
+    category: FieldCategory.RULES,
+    fieldType: FieldType.RULE_LIST,
+    props: {
+      label: '校验规则',
     },
   },
 };
