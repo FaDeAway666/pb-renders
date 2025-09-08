@@ -41,6 +41,7 @@ module.exports = defineConfig((overrides) => ({
   loader: {
     '.less': 'copy',
   },
+  minify: true,
   esbuildPlugins: [svgr()],
   onSuccess: () => emitDeclarations('./dist/typing'),
   clean: overrides.clean || !overrides.watch,
